@@ -29,7 +29,8 @@ The four entries in the **ADVANCED** group are intentionally locked in this buil
 
 ## Releases
 Download the current installer from [GitHub Releases](https://github.com/ProjectAtomOS/Atom-Tool-Box/releases).
-## QA and screenshots
+
+## Screenshots
 
 ## Documentation
 - [Audit report](docs/AUDIT_REPORT.md)
