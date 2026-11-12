@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>Atom.Toolbox</RootNamespace>
+    <AssemblyName>AtomToolbox</AssemblyName>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <ApplicationManifest Condition="'$(AtomNoElevation)' != 'true'">app.manifest</ApplicationManifest>
+    <ApplicationManifest Condition="'$(AtomNoElevation)' == 'true'">app.nomanifest</ApplicationManifest>
+    <StartupObject>Atom.Toolbox.Desktop.Program</StartupObject>
+    <TieredPGO>true</TieredPGO>
+    <TieredCompilation>true</TieredCompilation>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\*.png" />
+    <Resource Include="Assets\Logos\*.png" />
+    <Resource Include="Assets\app.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Atom.Toolbox.Infrastructure\Catalog\tweaks.json" />
+    <EmbeddedResource Include="Atom.Toolbox.Infrastructure\Catalog\catalog.sha256" />
+    <EmbeddedResource Include="Atom.Toolbox.Infrastructure\Catalog\license-public.pem" />
+    <EmbeddedResource Include="Atom.Toolbox.Infrastructure\Catalog\apps.json" />
+    <EmbeddedResource Include="Atom.Toolbox.Infrastructure\Catalog\debloat.json" />
+    <EmbeddedResource Include="Atom.Toolbox.Infrastructure\Catalog\powerplans.json" />
+    <EmbeddedResource Include="Atom.Toolbox.Infrastructure\Catalog\shortcuts.json" />
+    <EmbeddedResource Include="Atom.Toolbox.Infrastructure\Catalog\*.pow" />
+    <EmbeddedResource Include="Atom.Toolbox.Infrastructure\Assets\Scripts\**\*.ps1">
+      <LogicalName>scripts/%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

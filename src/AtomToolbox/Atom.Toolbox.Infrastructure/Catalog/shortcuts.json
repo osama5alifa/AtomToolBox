@@ -1,0 +1,389 @@
+{
+  "categories": [
+    {
+      "name": "SYSTEM",
+      "items": [
+        {
+          "name": "System Properties",
+          "cmd": "sysdm.cpl"
+        },
+        {
+          "name": "System Information",
+          "cmd": "msinfo32"
+        },
+        {
+          "name": "About Windows",
+          "cmd": "winver"
+        },
+        {
+          "name": "Advanced Settings",
+          "cmd": "SystemPropertiesAdvanced"
+        },
+        {
+          "name": "Performance Options",
+          "cmd": "SystemPropertiesPerformance"
+        },
+        {
+          "name": "Environment Variables",
+          "cmd": "rundll32 sysdm.cpl,EditEnvironmentVariables"
+        },
+        {
+          "name": "Date \u0026 Time",
+          "cmd": "timedate.cpl"
+        },
+        {
+          "name": "Region Settings",
+          "cmd": "intl.cpl"
+        }
+      ]
+    },
+    {
+      "name": "UPDATE \u0026 SECURITY",
+      "items": [
+        {
+          "name": "Windows Update",
+          "cmd": "ms-settings:windowsupdate"
+        },
+        {
+          "name": "Update History",
+          "cmd": "ms-settings:windowsupdate-history"
+        },
+        {
+          "name": "Update Options",
+          "cmd": "ms-settings:windowsupdate-options"
+        },
+        {
+          "name": "Active Hours",
+          "cmd": "ms-settings:windowsupdate-activehours"
+        },
+        {
+          "name": "Windows Security",
+          "cmd": "ms-settings:windowsdefender"
+        },
+        {
+          "name": "Virus \u0026 Threat",
+          "cmd": "windowsdefender:"
+        },
+        {
+          "name": "Recovery",
+          "cmd": "ms-settings:recovery"
+        },
+        {
+          "name": "Backup",
+          "cmd": "ms-settings:backup"
+        },
+        {
+          "name": "Find My Device",
+          "cmd": "ms-settings:findmydevice"
+        },
+        {
+          "name": "Activation",
+          "cmd": "ms-settings:activation"
+        }
+      ]
+    },
+    {
+      "name": "HARDWARE",
+      "items": [
+        {
+          "name": "Device Manager",
+          "cmd": "devmgmt.msc"
+        },
+        {
+          "name": "Disk Management",
+          "cmd": "diskmgmt.msc"
+        },
+        {
+          "name": "Sound Settings",
+          "cmd": "mmsys.cpl"
+        },
+        {
+          "name": "Power Options",
+          "cmd": "powercfg.cpl"
+        },
+        {
+          "name": "Display Settings",
+          "cmd": "ms-settings:display"
+        },
+        {
+          "name": "Bluetooth",
+          "cmd": "ms-settings:bluetooth"
+        },
+        {
+          "name": "Printers",
+          "cmd": "ms-settings:printers"
+        },
+        {
+          "name": "Mouse Settings",
+          "cmd": "main.cpl"
+        },
+        {
+          "name": "Keyboard Settings",
+          "cmd": "ms-settings:keyboard"
+        },
+        {
+          "name": "Game Controllers",
+          "cmd": "joy.cpl"
+        }
+      ]
+    },
+    {
+      "name": "NETWORK",
+      "items": [
+        {
+          "name": "Network Connections",
+          "cmd": "ncpa.cpl"
+        },
+        {
+          "name": "Network Status",
+          "cmd": "ms-settings:network-status"
+        },
+        {
+          "name": "WiFi Settings",
+          "cmd": "ms-settings:network-wifi"
+        },
+        {
+          "name": "Ethernet",
+          "cmd": "ms-settings:network-ethernet"
+        },
+        {
+          "name": "Proxy",
+          "cmd": "ms-settings:network-proxy"
+        },
+        {
+          "name": "VPN",
+          "cmd": "ms-settings:network-vpn"
+        },
+        {
+          "name": "Airplane Mode",
+          "cmd": "ms-settings:network-airplanemode"
+        },
+        {
+          "name": "Mobile Hotspot",
+          "cmd": "ms-settings:network-mobilehotspot"
+        },
+        {
+          "name": "Windows Firewall",
+          "cmd": "wf.msc"
+        },
+        {
+          "name": "Advanced Firewall",
+          "cmd": "wf.msc"
+        }
+      ]
+    },
+    {
+      "name": "APPS",
+      "items": [
+        {
+          "name": "Installed Apps",
+          "cmd": "ms-settings:appsfeatures"
+        },
+        {
+          "name": "Default Apps",
+          "cmd": "ms-settings:defaultapps"
+        },
+        {
+          "name": "Optional Features",
+          "cmd": "ms-settings:optionalfeatures"
+        },
+        {
+          "name": "Startup Apps",
+          "cmd": "ms-settings:startupapps"
+        },
+        {
+          "name": "Offline Maps",
+          "cmd": "ms-settings:maps"
+        },
+        {
+          "name": "Apps for Websites",
+          "cmd": "ms-settings:appsforwebsites"
+        },
+        {
+          "name": "Video Playback",
+          "cmd": "ms-settings:apps-videoplayback"
+        }
+      ]
+    },
+    {
+      "name": "PERSONALIZATION",
+      "items": [
+        {
+          "name": "Personalization",
+          "cmd": "ms-settings:personalization"
+        },
+        {
+          "name": "Colors",
+          "cmd": "ms-settings:colors"
+        },
+        {
+          "name": "Lock Screen",
+          "cmd": "ms-settings:lockscreen"
+        },
+        {
+          "name": "Themes",
+          "cmd": "ms-settings:themes"
+        },
+        {
+          "name": "Start Menu",
+          "cmd": "ms-settings:personalization-start"
+        },
+        {
+          "name": "Taskbar",
+          "cmd": "ms-settings:taskbar"
+        },
+        {
+          "name": "Fonts",
+          "cmd": "ms-settings:fonts"
+        },
+        {
+          "name": "Notifications",
+          "cmd": "ms-settings:notifications"
+        }
+      ]
+    },
+    {
+      "name": "ACCOUNTS \u0026 PRIVACY",
+      "items": [
+        {
+          "name": "Your Info",
+          "cmd": "ms-settings:yourinfo"
+        },
+        {
+          "name": "Sign-in Options",
+          "cmd": "ms-settings:signinoptions"
+        },
+        {
+          "name": "Family",
+          "cmd": "ms-settings:family"
+        },
+        {
+          "name": "Sync Settings",
+          "cmd": "ms-settings:sync"
+        },
+        {
+          "name": "Privacy",
+          "cmd": "ms-settings:privacy"
+        },
+        {
+          "name": "Location",
+          "cmd": "ms-settings:privacy-location"
+        },
+        {
+          "name": "Camera",
+          "cmd": "ms-settings:privacy-webcam"
+        },
+        {
+          "name": "Microphone",
+          "cmd": "ms-settings:privacy-microphone"
+        },
+        {
+          "name": "Speech",
+          "cmd": "ms-settings:privacy-speech"
+        },
+        {
+          "name": "Diagnostics",
+          "cmd": "ms-settings:privacy-feedback"
+        }
+      ]
+    },
+    {
+      "name": "STORAGE",
+      "items": [
+        {
+          "name": "Storage",
+          "cmd": "ms-settings:storagesense"
+        },
+        {
+          "name": "Storage Sense",
+          "cmd": "ms-settings:storagepolicies"
+        },
+        {
+          "name": "Disk Cleanup",
+          "cmd": "cleanmgr"
+        },
+        {
+          "name": "Save Locations",
+          "cmd": "ms-settings:savelocations"
+        }
+      ]
+    },
+    {
+      "name": "TOOLS",
+      "items": [
+        {
+          "name": "Registry Editor",
+          "cmd": "regedit"
+        },
+        {
+          "name": "Task Manager",
+          "cmd": "taskmgr"
+        },
+        {
+          "name": "Event Viewer",
+          "cmd": "eventvwr.msc"
+        },
+        {
+          "name": "Services",
+          "cmd": "services.msc"
+        },
+        {
+          "name": "Local Security",
+          "cmd": "secpol.msc"
+        },
+        {
+          "name": "Group Policy",
+          "cmd": "gpedit.msc"
+        },
+        {
+          "name": "Resource Monitor",
+          "cmd": "resmon"
+        },
+        {
+          "name": "Performance Monitor",
+          "cmd": "perfmon.msc"
+        },
+        {
+          "name": "Component Services",
+          "cmd": "comexp.msc"
+        },
+        {
+          "name": "Task Scheduler",
+          "cmd": "taskschd.msc"
+        },
+        {
+          "name": "Command Prompt",
+          "cmd": "cmd"
+        },
+        {
+          "name": "PowerShell",
+          "cmd": "powershell"
+        },
+        {
+          "name": "Windows Terminal",
+          "cmd": "wt"
+        },
+        {
+          "name": "Calculator",
+          "cmd": "calc"
+        },
+        {
+          "name": "Notepad",
+          "cmd": "notepad"
+        },
+        {
+          "name": "Paint",
+          "cmd": "mspaint"
+        },
+        {
+          "name": "Snipping Tool",
+          "cmd": "snippingtool"
+        },
+        {
+          "name": "Character Map",
+          "cmd": "charmap"
+        }
+      ]
+    }
+  ]
+}

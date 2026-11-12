@@ -1,33 +1,21 @@
-# Dependencies
-node_modules/
-
-# Build output
+# Build outputs
+bin/
+obj/
+publish/
 dist/
-out/
-release/
-
-# Generated screenshot gallery
-screenshots/
-
-# QA artifacts
-qa/logs/
-qa/tmp/
-qa/artifacts/
-*.log
-
-# Local environment
-.env
-.env.*
-!.env.example
-
-# OS / editor files
-.DS_Store
-Thumbs.db
-desktop.ini
+*.user
+.vs/
 .idea/
-.vscode/
-*.swp
 
-# Archives
-*.zip
-*.7z
+# Installer staging
+installer/stage/
+
+# Local data and QA artifacts
+*.log
+artifacts/
+.runtime/
+*.binlog
+
+# Private licence keys (never commit)
+tools/keys/*
+!tools/keys/.gitkeep

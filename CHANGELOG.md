@@ -1,52 +1,42 @@
 # Changelog
 
-All notable changes to AtomToolBox are recorded here.
+## 0.2.5 — native rewrite
 
-## [0.2.0] - 2026-10-21
+- Complete C#/.NET 8 WPF rewrite of the Electron 0.2.x application.
+- Single native assembly; no Electron, Node.js, WebView or third-party NuGet packages.
+- Typed tweak catalog generated from the legacy JSON + batch scripts:
+  - 295 tweaks preserved (216 free, 79 PRO).
+  - 564 registry writes, 68 service operations, 89 powercfg operations.
+  - Only 10 batch fallbacks, all in the PRO catalog.
+- Native implementations for registry, service control, power plans, timer resolution, startup
+  approval, context-menu verbs, accent colours, cleanup, restore points and hardware probes.
+- Native read-back verification for registry tweaks; 16-way parallel state scans.
+- Power Plans: focused switcher with installed schemes, active badge, one-click activation and
+  the full set of 20 legacy ready-made plans. The settings editor, timer and plan CRUD were
+  removed by request.
+- Dashboard, Background Monitor, Startup Manager, Debloat, Cleaner, App Installer, Installed
+  Apps, Backup & Restore, History, Settings, Shortcuts and all eight free tweak pages.
+- UI rebuilt to the legacy dark design with 1280×800 shell, grouped sidebar, status strip,
+  global search, toast notifications and Dark/OLED/Light themes.
+- Premium boundary: RSA-signed offline licence tokens; PRO pages load a clear upgrade state.
+- Hardening: catalog SHA-256 integrity check, anti-debug detection, elevation guard,
+  single-instance activation, validated inputs, structured logging.
+- Fixes over the legacy build:
+  - Power-plan APPLY no longer duplicates the plan on every click.
+  - Accent/startup/context-menu/cleaner no longer spawn PowerShell.
+  - Three inert context-menu entries removed.
+  - Page scroll resets on navigation; keyboard-accessible toggles.
+  - Power-plan GUID parsing and selection repaired.
+  - `Warning` resource collision removed.
+- Smooth UI: composition-driven smooth scrolling, page fade/slide transitions, theme pulse and
+  debounced search. No per-wheel timers.
+- Offline installer: self-contained .NET 8 `win-x64` payload packaged into a single branded
+  `AtomToolbox-Setup-0.2.5.exe` with desktop/Start Menu shortcuts and an uninstall entry.
+- Removed the in-repository legacy Electron tree; catalog regeneration points at the GitHub
+  repository instead.
+- QA: headless `--self-test`, 21-page UI Automation smoke test, theme switch verification and a
+  full installer/uninstaller cycle into a temporary directory.
 
-### Added
+## Legacy 0.2.0
 
-- Windows App Debloat page with a reviewable AppX/MSIX catalog, per-app selection, filtering and a confirmed remove action
-- All-user AppX removal plus provisioned-package cleanup to prevent reinstallation for new Windows accounts
-- Per-app removal results with installed/provisioned remaining counts and a fresh post-removal verification scan
-- `docs/DEBLOAT.md` and a focused `qa/debloat-live.js` harness
-- Background Monitor with process kill and IFEO-based application blocking
-- Startup Manager with native StartupApproved support
-- Personalize page with accent presets, taskbar and desktop icon controls
-- Context Menu add/remove verbs
-- Power Plans: create, import, export, rename, duplicate and delete
-- Everyday power settings editor and timer resolution controls
-- Backup & Restore: restore points and registry backups
-- Global search with Ctrl+K
-- Live CHECK STATE and registry audit export
-- Dark, OLED and Light themes
-
-### Changed
-
-- AtomToolBox now always runs as administrator: the packaged executable uses a `requireAdministrator` manifest and development launches re-open through UAC
-- Administrator detection uses the Windows high-integrity token SID instead of relying on the Server service
-- Debloat scanning is cached briefly and can be force-refreshed
-- Removal now uses one AppX snapshot and one provisioned-package snapshot instead of re-enumerating the system for every app, keeping large removals within the helper timeout
-- Reworked navigation into SYSTEM, OPTIMIZATIONS, TOOLS & UTILITIES, ADVANCED and MANAGEMENT & SAFETY
-- Replaced per-tweak PowerShell checks with batched checks
-- Replaced dashboard polling with native process and system snapshots
-- Locked the four ADVANCED tools behind the Atom Optimizer PRO prompt
-
-### Fixed
-
-- Fixed false “REMOVAL FAILED” reports after Windows had already removed the selected apps
-- Removal progress is written atomically after every app, so a helper timeout or unexpected exit can still return partial results instead of discarding them
-- A rejected or incomplete helper result now triggers a fresh AppX scan before the UI reports failure
-- Provisioned-package verification failures and current-user-only scans are surfaced instead of being silently treated as success
-- Removed fabricated, duplicate and unreferenced tweaks and scripts
-- Corrected power-plan GUIDs, registry values and hidden-setting checks
-- Fixed command-line quoting that could make plain-command tweaks silently do nothing
-- Fixed false OFF states in hidden power settings, privacy checks and hex comparisons
-- Fixed power-plan parsing, accent palette bounds and plan-studio selection state
-- Hardened admin gating and non-fatal failure logging
-
-### Notes
-
-- Windows 10 22H2 was the primary live-test platform for this release.
-- The installer is currently unsigned.
-- Electron 28 remains the runtime used by this release; upgrading the Electron major version is tracked separately because it requires a fresh packaging and compatibility pass.
+See the original [AtomToolBox repository](https://github.com/osama5alifa/AtomToolBox).

@@ -1,0 +1,199 @@
+<Window x:Class="Atom.Toolbox.Desktop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        Title="ATOM TOOLBOX"
+        Width="1280" Height="800" MinWidth="960" MinHeight="600"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" ResizeMode="CanResize"
+        Background="{DynamicResource Bg}"
+        Foreground="{DynamicResource Text}"
+        FontFamily="{StaticResource UiFont}" FontSize="12"
+        TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType"
+        RenderOptions.ClearTypeHint="Enabled"
+        UseLayoutRounding="True" SnapsToDevicePixels="True">
+
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="0" ResizeBorderThickness="6"
+                            GlassFrameThickness="0" CornerRadius="0"
+                            UseAeroCaptionButtons="False" />
+    </shell:WindowChrome.WindowChrome>
+
+    <Grid x:Name="Root">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="56" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="26" />
+        </Grid.RowDefinitions>
+
+        <!-- Title strip -->
+        <Border x:Name="TitleBar" Grid.Row="0" Background="{DynamicResource Bg}"
+                BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1"
+                Padding="18,0,10,0" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Image Source="{Binding LogoPath}" Height="42" Stretch="Uniform" Margin="0,0,14,0"
+                           RenderOptions.BitmapScalingMode="HighQuality" />
+                    <Border Width="1" Height="24" Background="{DynamicResource Border}" Margin="0,0,14,0" />
+                    <TextBlock Text="{Binding CpuText}" Foreground="{DynamicResource TextDim}" FontSize="12"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text="|" Foreground="{DynamicResource TextFaint}" Margin="12,0,12,0"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding GpuText}" Foreground="{DynamicResource TextDim}" FontSize="12"
+                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis" MaxWidth="280" />
+                    <TextBlock Text="|" Foreground="{DynamicResource TextFaint}" Margin="12,0,12,0"
+                               VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding OsText}" Foreground="{DynamicResource TextDim}" FontSize="12"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <Grid Grid.Column="1" Width="320" HorizontalAlignment="Center" VerticalAlignment="Center"
+                      x:Name="SearchHost">
+                    <TextBox x:Name="SearchBox" Style="{StaticResource DarkTextBox}"
+                             Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             KeyDown="SearchBox_KeyDown" />
+                    <TextBlock Text="SEARCH TWEAKS &amp; APPS  [CTRL+K]" FontSize="10"
+                               Foreground="{DynamicResource TextMuted}" Margin="10,0,0,0"
+                               VerticalAlignment="Center" IsHitTestVisible="False"
+                               Visibility="{Binding SearchText, Converter={StaticResource EmptyToVisible}}" />
+                    <Popup x:Name="SearchPopup" PlacementTarget="{Binding ElementName=SearchBox}"
+                           Placement="Bottom" IsOpen="{Binding IsSearchOpen}" StaysOpen="False"
+                           AllowsTransparency="True" PopupAnimation="None" VerticalOffset="6">
+                        <Border Width="420" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Border}"
+                                BorderThickness="1" MaxHeight="380">
+                            <ListBox x:Name="SearchList" ItemsSource="{Binding SearchResults}"
+                                     Style="{StaticResource BareList}" MaxHeight="380"
+                                     MouseLeftButtonUp="SearchList_MouseLeftButtonUp">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="Transparent" Padding="10,7,10,7"
+                                                BorderBrush="{DynamicResource Border}" BorderThickness="0,0,0,1">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Title}" FontSize="11"
+                                                               Foreground="{DynamicResource Text}" />
+                                                    <TextBlock Text="{Binding Subtitle}" FontSize="10"
+                                                               Foreground="{DynamicResource TextDim}"
+                                                               TextTrimming="CharacterEllipsis" MaxWidth="330" />
+                                                </StackPanel>
+                                                <Border Grid.Column="1" Padding="5,2,5,2" BorderBrush="{DynamicResource Border}"
+                                                        BorderThickness="1" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Tag}" FontSize="8"
+                                                               Foreground="{DynamicResource TextMuted}" />
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Border>
+                    </Popup>
+                </Grid>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="_" Style="{StaticResource WindowButton}" Click="Minimize_Click" />
+                    <Button x:Name="MaximizeButton" Content="[]" Style="{StaticResource WindowButton}" Click="Maximize_Click" />
+                    <Button Content="X" Style="{StaticResource CloseButton}" Click="Close_Click" Margin="0,0,6,0" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Sidebar + content -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="210" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="{DynamicResource Bg}"
+                    BorderBrush="{DynamicResource Border}" BorderThickness="0,0,1,0">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                              Padding="0,4,0,8" Focusable="False">
+                    <ItemsControl ItemsSource="{Binding NavGroups}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,0,0,4">
+                                    <Border BorderBrush="{DynamicResource Border}" BorderThickness="0,1,0,0"
+                                            Margin="0,4,0,0"
+                                            Visibility="{Binding HasTitle, Converter={StaticResource BoolToVis}}">
+                                        <TextBlock Text="{Binding Title}" Style="{StaticResource NavGroupTitle}" />
+                                    </Border>
+                                    <ItemsControl ItemsSource="{Binding Items}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Style="{StaticResource NavButton}"
+                                                        AutomationProperties.Name="{Binding Label}"
+                                                        Command="{Binding DataContext.NavigateCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        CommandParameter="{Binding}">
+                                                    <Grid>
+                                                        <TextBlock Text="{Binding Label}" />
+                                                        <Border HorizontalAlignment="Right" VerticalAlignment="Center"
+                                                                Padding="4,1,4,1" BorderBrush="{DynamicResource TextFaint}"
+                                                                BorderThickness="1"
+                                                                Visibility="{Binding IsLocked, Converter={StaticResource BoolToVis}}">
+                                                            <TextBlock Text="PRO" FontSize="8" Foreground="{DynamicResource TextMuted}" />
+                                                        </Border>
+                                                    </Grid>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
+
+            <ContentControl x:Name="PageHost" Grid.Column="1" Content="{Binding CurrentPage}" Focusable="False">
+                <ContentControl.RenderTransform>
+                    <TranslateTransform x:Name="PageTranslate" />
+                </ContentControl.RenderTransform>
+            </ContentControl>
+        </Grid>
+
+        <!-- Status strip -->
+        <Border Grid.Row="2" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Border}"
+                BorderThickness="0,1,0,0" Padding="16,0,16,0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock FontSize="10" Foreground="{DynamicResource TextDim}" FontFamily="{StaticResource MonoFont}">
+                    <Run Text="SYSTEM_INTEGRITY: " /><Run Text="{Binding IntegrityText, Mode=OneWay}"
+                                                   Foreground="{DynamicResource TextMuted}" />
+                </TextBlock>
+                <TextBlock FontSize="10" Foreground="{DynamicResource TextDim}" FontFamily="{StaticResource MonoFont}"
+                           Margin="28,0,0,0">
+                    <Run Text="ACTIVE_PROFILE: " /><Run Text="{Binding ProfileText, Mode=OneWay}"
+                                                   Foreground="{DynamicResource TextMuted}" />
+                </TextBlock>
+                <TextBlock FontSize="10" Foreground="{DynamicResource TextDim}" FontFamily="{StaticResource MonoFont}"
+                           Margin="28,0,0,0">
+                    <Run Text="SESSION: " /><Run Text="{Binding SessionText, Mode=OneWay}"
+                                          Foreground="{DynamicResource TextMuted}" />
+                </TextBlock>
+            </StackPanel>
+        </Border>
+
+        <!-- Toast -->
+        <Border Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                Background="{DynamicResource Panel}" BorderBrush="{DynamicResource Border}" BorderThickness="1"
+                Padding="12,9,14,9" Margin="0,0,18,16" MaxWidth="380"
+                Visibility="{Binding IsToastVisible, Converter={StaticResource BoolToVis}}">
+            <StackPanel>
+                <TextBlock Text="{Binding ToastMessage}" FontSize="11" Foreground="{DynamicResource Text}" />
+                <TextBlock Text="{Binding ToastSub}" FontSize="10" Foreground="{DynamicResource TextDim}"
+                           Margin="0,3,0,0" TextWrapping="Wrap"
+                           Visibility="{Binding ToastSub, Converter={StaticResource EmptyToCollapsed}}" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

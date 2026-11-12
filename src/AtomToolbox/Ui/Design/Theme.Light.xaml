@@ -1,0 +1,23 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <FontFamily x:Key="UiFont">Segoe UI</FontFamily>
+    <FontFamily x:Key="MonoFont">Consolas</FontFamily>
+
+    <SolidColorBrush x:Key="Bg" Color="#F4F5F7" />
+    <SolidColorBrush x:Key="Panel" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="Border" Color="#D9DCE1" />
+    <SolidColorBrush x:Key="Text" Color="#15181D" />
+    <SolidColorBrush x:Key="TextDim" Color="#474C55" />
+    <SolidColorBrush x:Key="TextMuted" Color="#71777F" />
+    <SolidColorBrush x:Key="TextFaint" Color="#AEB3BB" />
+    <SolidColorBrush x:Key="Hover" Color="#E9EBEF" />
+    <SolidColorBrush x:Key="Toggle" Color="#DFE2E7" />
+    <SolidColorBrush x:Key="Success" Color="#228822" />
+    <SolidColorBrush x:Key="Danger" Color="#BB2222" />
+    <SolidColorBrush x:Key="Warning" Color="#8A6A00" />
+    <SolidColorBrush x:Key="WarnBg" Color="#FFF8E0" />
+    <SolidColorBrush x:Key="WarnBorder" Color="#CCAA00" />
+    <SolidColorBrush x:Key="WarnText" Color="#886600" />
+    <SolidColorBrush x:Key="Scrim" Color="#6B14181E" />
+    <SolidColorBrush x:Key="CloseHover" Color="#990000" />
+</ResourceDictionary>

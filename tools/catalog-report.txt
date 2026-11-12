@@ -1,0 +1,38 @@
+AtomToolBox catalog build report
+Source: AtomToolBox 0.2.0 legacy Electron repository
+
+windows       79 tweaks  (free)
+gaming        15 tweaks  (free)
+gpu           27 tweaks  (free)
+power         20 tweaks  (free)
+network       12 tweaks  (free)
+privacy       23 tweaks  (free)
+personalize   21 tweaks  (free)
+brave         19 tweaks  (free)
+others        60 tweaks  (pro)
+winupdate     19 tweaks  (pro)
+
+TOTAL: 295 tweaks
+
+Native action coverage:
+  registry          564
+  powercfg           89
+  service            68
+  registry-delete    56
+  process            29
+  powershell         22
+  accent             20
+  batch              10
+  power-scheme        1
+
+Batch fallbacks: 10
+  others/remove_temp_files: ON → file-system command: rd
+  others/remove_onedrive: ON → control-flow block
+  winupdate/wu_target_release: ON → control-flow block
+  winupdate/wu_metered_ethernet_wifi: ON → external PowerShell helper
+  winupdate/wu_metered_ethernet_wifi: OFF → external PowerShell helper
+  winupdate/wu_disable_service: ON → control-flow block
+  winupdate/wu_disable_service: OFF → control-flow block
+  winupdate/wu_disable_uso: ON → control-flow block
+  winupdate/wu_disable_uso: OFF → control-flow block
+  winupdate/wu_disable_medic: ON → control-flow block
