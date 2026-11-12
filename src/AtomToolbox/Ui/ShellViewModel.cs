@@ -374,7 +374,6 @@ public sealed class ShellViewModel : ObservableObject
             new NavItemViewModel { Id = "winupdate", Label = "WINDOWS UPDATE", IsLocked = true },
             new NavItemViewModel { Id = "dns", Label = "DNS OPTIMIZER", IsLocked = true },
             new NavItemViewModel { Id = "drivers", Label = "DRIVER HUB", IsLocked = true },
-            new NavItemViewModel { Id = "optimizer", Label = "GET ATOM OPTIMIZER →", IsCallToAction = true, IsLocked = true }
         ]
     };
 

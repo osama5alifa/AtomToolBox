@@ -54,42 +54,24 @@ public sealed class PageFactory(
             "history" => new HistoryViewModel(history, toast),
             "settings" => new SettingsViewModel(settings, state, audit, catalog, environment,
                 theme => _shell?.ApplyThemeAsync(theme) ?? Task.CompletedTask, toast),
-            "advpower" => Pro("ADVANCED POWER CONFIGURATOR", environment, toast),
-            "winupdate" => Pro("WINDOWS UPDATE", environment, toast),
-            "dns" => Pro("DNS OPTIMIZER", environment, toast),
-            "drivers" => Pro("DRIVER HUB", environment, toast),
-            "optimizer" => Pro("ATOM OPTIMIZER", environment, toast),
+            "advpower" => Pro("ADVANCED POWER CONFIGURATOR"),
+            "winupdate" => Pro("WINDOWS UPDATE"),
+            "dns" => Pro("DNS OPTIMIZER"),
+            "drivers" => Pro("DRIVER HUB"),
             _ => null
         };
     }
 
-    private static PageViewModel Pro(string title, IEnvironmentService environment, Action<string, string?> toast) =>
-        new ProGateViewModel(title, environment, toast);
+    private static PageViewModel Pro(string title) => new ProGateViewModel(title);
 }
 
 public sealed class ProGateViewModel : PageViewModel
 {
-    private const string OptimizerUrl = "https://www.atom-os.com/optimizer";
-
-    public ProGateViewModel(string title, IEnvironmentService environment, Action<string, string?> toast)
+    public ProGateViewModel(string title)
     {
         Title = title;
         CountText = "(PRO)";
-        Intro = "THIS TOOL ONLY COMES WITH ATOM OPTIMIZER.";
         HasConsole = false;
         ShowAdminWarning = false;
-
-        Toolbar.Add(new ActionButtonViewModel("GET ATOM OPTIMIZER ?", new RelayCommand(() =>
-        {
-            try
-            {
-                environment.OpenUrl(OptimizerUrl);
-                toast("OPENING ATOM OPTIMIZER", OptimizerUrl);
-            }
-            catch (Exception ex)
-            {
-                toast("COULD NOT OPEN BROWSER", ex.Message);
-            }
-        })));
     }
 }
