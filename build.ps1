@@ -66,18 +66,10 @@ switch ($Task) {
 
     'Setup' {
         $selfContained = Join-Path $root 'publish\self-contained'
-        $setupExe = Join-Path $root "publish\AtomToolbox-Setup-$version.exe"
-        $nsisScript = Join-Path $root 'installer\AtomToolbox.nsi'
-        $makensis = Join-Path $root 'tools\NSIS\nsis-3.11\makensis.exe'
-        if (-not (Test-Path -LiteralPath $makensis)) {
-            $makensis = Join-Path ${env:ProgramFiles(x86)} 'NSIS\makensis.exe'
-        }
-        if (-not (Test-Path -LiteralPath $makensis)) {
-            $makensis = Join-Path $env:ProgramFiles 'NSIS\makensis.exe'
-        }
-        if (-not (Test-Path -LiteralPath $makensis)) {
-            throw 'NSIS was not found. Install NSIS 3.x or place it in tools\NSIS\nsis-3.11.'
-        }
+        $payloadZip = Join-Path $root 'publish\payload.zip'
+        $setupExe = Join-Path $root 'publish\AtomToolbox-Setup.exe'
+        $csc = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+        $fw = Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319'
 
         Write-Host 'Restoring the self-contained win-x64 runtime...' -ForegroundColor Cyan
         Invoke-DotNet (@('restore', $project, '-r', 'win-x64', '-p:RestoreIgnoreFailedSources=true') + $common)
@@ -96,27 +88,39 @@ switch ($Task) {
             throw 'The published application does not request administrator rights.'
         }
 
-        Get-Process -Name AtomToolbox-Setup -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-        if (Test-Path -LiteralPath $setupExe) { Remove-Item -LiteralPath $setupExe -Force }
-        Write-Host 'Building the NSIS installer...' -ForegroundColor Cyan
-        Push-Location (Join-Path $root 'installer')
+        $sevenZip = Join-Path $env:ProgramFiles '7-Zip\7z.exe'
+        if (-not (Test-Path -LiteralPath $sevenZip)) { $sevenZip = Join-Path ${env:ProgramFiles(x86)} '7-Zip\7z.exe' }
+        if (-not (Test-Path -LiteralPath $sevenZip)) { throw '7-Zip was not found.' }
+
+        if (Test-Path -LiteralPath $payloadZip) { Remove-Item -LiteralPath $payloadZip -Force }
+        Push-Location $selfContained
         try {
-            & $makensis "/DPAYLOAD=$selfContained" "/DOUTFILE=$setupExe" $nsisScript
-            if ($LASTEXITCODE -ne 0) { throw "makensis exited with code $LASTEXITCODE" }
+            & $sevenZip a -tzip -mx=9 $payloadZip '*'
+            if ($LASTEXITCODE -ne 0) { throw "7-Zip exited with code $LASTEXITCODE" }
         } finally {
             Pop-Location
         }
-        if (-not (Test-Path -LiteralPath $setupExe)) { throw 'NSIS did not produce the installer.' }
 
-        $latestSetup = Join-Path $root 'publish\AtomToolbox-Setup.exe'
-        if (Test-Path -LiteralPath $latestSetup) { Remove-Item -LiteralPath $latestSetup -Force }
-        try { New-Item -ItemType HardLink -Path $latestSetup -Target $setupExe -ErrorAction Stop | Out-Null }
-        catch { Copy-Item -LiteralPath $setupExe -Destination $latestSetup -Force }
+        Get-Process -Name AtomToolbox-Setup -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+        if (Test-Path -LiteralPath $setupExe) { Remove-Item -LiteralPath $setupExe -Force }
 
-        $sizeMb = [math]::Round((Get-Item -LiteralPath $setupExe).Length / 1MB, 1)
+        Write-Host 'Compiling the standalone installer...' -ForegroundColor Cyan
+        & $csc /nologo /target:winexe /platform:x64 /optimize+ "/out:$setupExe" `
+            "/win32icon:$root\src\Atomtoolbox\Assets\app.ico" `
+            "/win32manifest:$root\installer\AtomToolboxSetup.manifest" `
+            "/r:$fw\System.dll" "/r:$fw\System.Core.dll" "/r:$fw\System.Drawing.dll" `
+            "/r:$fw\System.Windows.Forms.dll" "/r:$fw\System.IO.Compression.dll" `
+            "/r:$fw\System.IO.Compression.FileSystem.dll" `
+            "/resource:$payloadZip,payload.zip" `
+            "$root\installer\AtomToolboxSetup.cs"
+        if ($LASTEXITCODE -ne 0) { throw "csc exited with code $LASTEXITCODE" }
+        if (-not (Test-Path -LiteralPath $setupExe)) { throw 'The installer was not created.' }
+
         Remove-Item -LiteralPath $selfContained -Recurse -Force
+        Remove-Item -LiteralPath $payloadZip -Force
+        $sizeMb = [math]::Round((Get-Item -LiteralPath $setupExe).Length / 1MB, 1)
         Write-Host "Installer ready: $setupExe ($sizeMb MB)" -ForegroundColor Green
-        Write-Host 'It bundles the .NET 8 runtime; no download or prerequisite is required.' -ForegroundColor Green
+        Write-Host 'One file. No temp extraction and no .NET runtime prerequisite.' -ForegroundColor Green
         break
     }
     'PublishSingleFile' {

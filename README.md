@@ -85,7 +85,7 @@ pages remain as upgrade placeholders.
 
 Download the current installer from
 [GitHub Releases](https://github.com/osama5alifa/AtomToolBox/releases/latest). The file is about
-45 MB and is not code-signed yet, so Windows SmartScreen may show a warning.
+59 MB and is not code-signed yet, so Windows SmartScreen may show a warning.
 
 You can install over an existing 0.2.0 Electron installation. Setup closes the old app, moves
 `C:\Program Files\AtomToolBox` to a `.old-*` folder if it cannot be replaced, and removes the old
@@ -95,15 +95,10 @@ The installer writes to `%ProgramFiles%\AtomToolBox`, creates a public desktop s
 Start Menu shortcut, and adds an AtomToolBox entry to Apps & Features. User settings, history and
 backups stay in `%LOCALAPPDATA%\AtomToolBox` when the app is uninstalled.
 
-### Portable fallback
-
-If the installer reports a temp-folder error, download `AtomToolbox-Portable-0.2.5.zip` from the
-same release, extract it into a folder, and run `Atomtoolbox.exe` as administrator. The portable
-package does not use an installer or a temp folder.
 
 ## Build
 
-Requirements: Windows x64, the .NET 8 SDK, and NSIS 3.x for the `Setup` task.
+Requirements: Windows x64 and the .NET 8 SDK. The `Setup` task uses the built-in .NET Framework compiler.
 
 ```powershell
 ./build.ps1 -Task Build        # compile
@@ -112,9 +107,10 @@ Requirements: Windows x64, the .NET 8 SDK, and NSIS 3.x for the `Setup` task.
 ./build.ps1 -Task Setup        # self-contained installer
 ```
 
-`Setup` publishes a self-contained `win-x64` build and builds it with NSIS. The output is `publish/AtomToolbox-Setup.exe`, with a versioned copy at
-`publish/AtomToolbox-Setup-0.2.5.exe`. The .NET 8 `win-x64` runtime packs must be present in the
-NuGet cache; after that, the build does not need a network connection.
+`Setup` publishes a self-contained `win-x64` build, embeds it into a small C# installer and
+writes one `publish/AtomToolbox-Setup.exe`. The installer extracts directly to Program Files,
+so it does not use a temp folder. The .NET 8 `win-x64` runtime packs must be present in the NuGet
+cache; after that, the build does not need a network connection.
 
 Manual build:
 
@@ -134,7 +130,7 @@ src/AtomToolbox/
   Program.cs                    Composition root, elevation and single instance
   SelfTest.cs                   Headless engine diagnostic
 
-installer/                      NSIS installer script and helper scripts
+installer/                      standalone C# installer source and manifest
 tools/
   Atom.CatalogBuilder/          Builds the catalog from the old JSON and scripts
   Atom.LicenseIssuer/           Offline RSA licence tooling
