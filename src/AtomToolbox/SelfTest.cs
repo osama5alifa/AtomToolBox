@@ -54,7 +54,7 @@ internal static class SelfTest
                 powerPlans,
                 new AccentService(registry, environment));
 
-            Check("catalog", catalog.TotalTweakCount == 295, $"{catalog.TotalTweakCount} tweaks / {catalog.Pages.Count} pages");
+            Check("catalog", catalog.TotalTweakCount == 234, $"{catalog.TotalTweakCount} tweaks / {catalog.Pages.Count} pages");
             Check("free pages", catalog.FreePages.Count == 8, $"{catalog.FreeTweakCount} free tweaks");
             Check("bundled power plans", CatalogResources.Plans.Count == 20, $"{CatalogResources.Plans.Count} plans");
 

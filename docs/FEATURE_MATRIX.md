@@ -2,7 +2,7 @@
 
 The legacy build is the 0.2.0 Electron repository. “Parity” below means the feature exists with the
 same visible behaviour; “improved” means the rewrite fixes a defect or removes a shell
-dependency. Every free tweak is present; the PRO catalog is present but gated.
+dependency. Every tweak in this build is free; the PRO-tagged pages remain as upgrade placeholders.
 
 ## Navigation
 
@@ -11,12 +11,12 @@ dependency. Every free tweak is present; the PRO catalog is present but gated.
 | Dashboard | Metrics only | Metrics + system-information cards | Native CPU/memory/disk/GPU/uptime, no WMI |
 | Background Monitor | 40 processes, kill, block | Same | Native process API; IFEO block with previous Debugger backup |
 | Shortcuts | 9 categories / 85 tools | Same | ShellExecute, no console |
-| Windows | 79 tweaks | 79 | Native registry + service actions |
+| Windows | 79 tweaks | 90 | Native registry + service actions; WinUtil-parity additions included |
 | Gaming | 15 tweaks | 15 | Includes BCDEdit process actions |
-| GPU | 27 tweaks | 27 | Native |
+| GPU | 27 tweaks | 28 | Native; adds full MPO disable |
 | Power | 20 tweaks | 20 | Native powercfg |
 | Network | 12 tweaks | 12 | Native |
-| Privacy | 23 tweaks | 23 | Native |
+| Privacy | 23 tweaks | 29 | Native; promoted activity/store/location/consumer/AI entries |
 | Context Menu | 21 entries, 3 inert | 18 working entries | Three fabricated CLSIDs removed (see fixes) |
 | Brave Debloater | 19 tweaks | 19 | Native |
 | Windows Debloat | AppX groups | 37 groups | PowerShell only for `Get-AppxPackage` / removal |
@@ -24,10 +24,10 @@ dependency. Every free tweak is present; the PRO catalog is present but gated.
 | Power Plans | Studio + 20 plans + timer | Installed schemes, active badge, all 20 ready-made plans | Settings/editor removed by request; native powercfg; duplicate-per-apply fixed |
 | Startup Manager | 4 Run keys + 2 folders | Same | Native StartupApproved blobs / file renames |
 | Personalize | 21 tweaks | 21 | Accent writes are native, no PowerShell helper |
-| Advanced Power | PRO | PRO gate | Catalog + service layer present; locked |
-| Windows Update | PRO | PRO gate | 19 update tweaks embedded in the PRO catalog |
-| DNS Optimizer | PRO | PRO gate | Locked like the legacy build |
-| Driver Hub | PRO | PRO gate | Locked like the legacy build |
+| Advanced Power | PRO | PRO page | Upgrade placeholder only; no tweak catalog behind it |
+| Windows Update | PRO | PRO page | Upgrade placeholder only; no tweaks behind it |
+| DNS Optimizer | PRO | PRO page | Upgrade placeholder only; no DNS implementation |
+| Driver Hub | PRO | PRO page | Upgrade placeholder only |
 | Get Atom Optimizer | PRO modal | PRO page | Clear upgrade boundary |
 | Backup & Restore | Restore points + .reg | Same | `SRSetRestorePoint`, `reg export/import` |
 | App Installer | 51 apps | 51 | HttpClient download with progress/cancel |
@@ -53,17 +53,17 @@ dependency. Every free tweak is present; the PRO catalog is present but gated.
 
 | Metric | Value |
 | --- | --- |
-| Catalog pages | 10 (8 free, 2 PRO) |
-| Total tweaks | 295 |
-| Free tweaks | 216 |
-| Registry actions | 564 |
-| Registry-delete actions | 56 |
-| Service actions | 68 |
-| powercfg actions | 89 |
-| Process actions | 29 |
-| PowerShell actions | 22 |
-| Accent actions | 20 |
-| Batch fallbacks | 10 (all PRO) |
+| Catalog pages | 8 (all free) |
+| Total tweaks | 234 |
+| Free tweaks | 234 |
+| Registry actions | 251 |
+| Registry-delete actions | 29 (revert) |
+| Service actions | 27 |
+| powercfg actions | 45 |
+| Process actions | 14 |
+| PowerShell actions | 11 |
+| Accent actions | 10 |
+| Batch actions | 1 |
 
 Full per-tweak reasons are in `tools/catalog-report.txt`.
 
@@ -73,8 +73,7 @@ Full per-tweak reasons are in `tools/catalog-report.txt`.
 2. **Power-plan duplicate storm.** The legacy APPLY button imported the bundled `.pow` on
    every click, creating a new plan each time. 0.2.5 caches the imported GUID and activates the
    existing plan; it only imports when the plan is genuinely missing.
-3. **No PowerShell for the free engine.** Accent, startup, context-menu and cleaner operations
-   are native. Only the 10 PRO fallbacks still use batch/PowerShell.
+3. **The PRO catalog is gone.** The 79 gated entries were removed. Twelve named entries were promoted into the free pages and six WinUtil-parity entries were added; the PRO-tagged pages are UI placeholders only.
 4. **Verification is real.** Registry changes are read back value-by-value instead of trusting a
    batch exit code. Failures keep the toggle in its previous state.
 5. **Three inert context-menu GUIDs removed.** `Include in library`, `Edit with Paint` and
@@ -94,10 +93,10 @@ Full per-tweak reasons are in `tools/catalog-report.txt`.
 
 ## Known limitations
 
-- The four ADVANCED modules (Advanced Power, Windows Update, DNS, Driver Hub) remain PRO, as in
-  the legacy free build. Their catalog data and service seams are present.
-- The 10 PRO batch fallbacks still execute legacy script text (Windows Update policies,
-  OneDrive/temp removal). They are not reachable without a PRO licence.
+- The four ADVANCED modules (Advanced Power, Windows Update, DNS, Driver Hub) remain PRO-tagged
+  pages. They no longer contain tweak definitions or a hidden catalog.
+- Some free removals and the BitLocker/svchost/AI entries use PowerShell by necessity. The rest of
+  the engine remains native.
 - Restore points require System Protection to be enabled for the system drive.
 - AppX enumeration/removal uses PowerShell because Windows exposes no practical managed API
   without additional COM/WinRT plumbing.

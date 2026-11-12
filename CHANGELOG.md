@@ -4,10 +4,15 @@
 
 - Complete C#/.NET 8 WPF rewrite of the Electron 0.2.x application.
 - Single native assembly; no Electron, Node.js, WebView or third-party NuGet packages.
-- Typed tweak catalog generated from the legacy JSON + batch scripts:
-  - 295 tweaks preserved (216 free, 79 PRO).
-  - 564 registry writes, 68 service operations, 89 powercfg operations.
-  - Only 10 batch fallbacks, all in the PRO catalog.
+- Typed tweak catalog:
+  - 234 tweaks, all free.
+  - 251 registry writes, 27 service operations, 45 powercfg operations.
+  - The 79-entry PRO catalog was removed; the PRO-tagged pages remain as placeholders.
+  - 12 useful PRO entries were promoted into the free pages.
+  - Six WinUtil-parity entries added: svchost splitting, BitLocker, Reserved Storage, device
+    companion blocking, full Delivery Optimization disable and full MPO disable.
+  - 11 PowerShell and 1 batch action remain for AppX removal, OneDrive, Edge, BitLocker, AI,
+    svchost, DNS and legacy helper cases.
 - Native implementations for registry, service control, power plans, timer resolution, startup
   approval, context-menu verbs, accent colours, cleanup, restore points and hardware probes.
 - Native read-back verification for registry tweaks; 16-way parallel state scans.
@@ -18,7 +23,8 @@
   Apps, Backup & Restore, History, Settings, Shortcuts and all eight free tweak pages.
 - UI rebuilt to the legacy dark design with 1280×800 shell, grouped sidebar, status strip,
   global search, toast notifications and Dark/OLED/Light themes.
-- Premium boundary: RSA-signed offline licence tokens; PRO pages load a clear upgrade state.
+- Premium boundary: PRO pages still show the upgrade state, but no PRO tweak definitions ship
+  in the catalog. The RSA licence code remains for future use.
 - Hardening: catalog SHA-256 integrity check, anti-debug detection, elevation guard,
   single-instance activation, validated inputs, structured logging.
 - Fixes over the legacy build:

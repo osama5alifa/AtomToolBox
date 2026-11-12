@@ -9,8 +9,8 @@ dotnet src/AtomToolbox/bin/Release/net8.0-windows/AtomToolbox.dll --self-test
 On the reference machine:
 
 ```text
-[PASS] catalog - 295 tweaks / 10 pages
-[PASS] free pages - 216 free tweaks
+[PASS] catalog - 234 tweaks / 8 pages
+[PASS] free pages - 234 free tweaks
 [PASS] bundled power plans - 20 plans
 [PASS] shortcut catalog - 85 shortcuts / 9 categories
 [SKIP] registry write - this environment blocks HKCU writes.
@@ -45,7 +45,7 @@ Additional checks performed:
 - Power Plans: loaded 4 installed schemes and all 20 ready-made legacy plans; the active badge
   matched the active scheme. The page no longer exposes settings/timer/editor controls.
 - Startup Manager: 5 entries, 3 enabled, 2 stale overrides noted.
-- Windows page: 79 tweaks rendered with native check state and toggle controls.
+- Windows page: 90 tweaks rendered, including the WinUtil parity additions and promoted entries.
 - Scroll position resets on navigation (no page opens mid-document).
 
 ## Performance snapshot
@@ -61,7 +61,7 @@ Release configuration, framework-dependent:
 | 4 | 775 ms |
 
 Working set after the dashboard settled: **~126 MB**. The legacy Electron process tree was
-multiple processes over several hundred MB. This figure includes WPF, the parsed 295-tweak
+multiple processes over several hundred MB. This figure includes WPF, the parsed 234-tweak
 catalog, the theme dictionary and the rendered dashboard.
 
 Most of the startup budget is WPF/CLR initialization and BAML loading, not application work

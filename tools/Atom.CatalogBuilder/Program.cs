@@ -16,9 +16,7 @@ internal static class Program
         new("network", "NETWORK & LATENCY", "NETWORK", "network", "free"),
         new("privacy", "PRIVACY SETTINGS", "PRIVACY", "privacy", "free"),
         new("personalize", "PERSONALIZE & APPEARANCE", "THEME", "personalize", "free"),
-        new("brave", "BRAVE BROWSER DEBLOAT", "BRAVE", "brave", "free"),
-        new("others", "SYSTEM TOOLKIT", "TOOLKIT", "others", "pro"),
-        new("winupdate", "WINDOWS UPDATE", "UPDATES", "winupdate", "pro")
+        new("brave", "BRAVE BROWSER DEBLOAT", "BRAVE", "brave", "free")
     ];
 
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -118,8 +116,9 @@ internal static class Program
             report.Add($"{pageDefinition.Id,-12} {built.Count,3} tweaks  ({pageDefinition.Access})");
         }
 
-        var catalog = new CatalogFile("0.2.5", DateTime.UtcNow.ToString("O"), pages);
         var catalogPath = Path.Combine(outputRoot, "tweaks.json");
+        pages = MergeHandMaintainedTweaks(catalogPath, pages);
+        var catalog = new CatalogFile("0.2.5", DateTime.UtcNow.ToString("O"), pages);
         WriteJson(catalogPath, catalog);
         var hash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(File.ReadAllBytes(catalogPath)));
         File.WriteAllText(Path.Combine(outputRoot, "catalog.sha256"), hash);
@@ -151,6 +150,47 @@ internal static class Program
         File.WriteAllLines(reportPath, report);
         Console.WriteLine(string.Join(Environment.NewLine, report));
         return 0;
+    }
+
+    private static List<CatalogPage> MergeHandMaintainedTweaks(string catalogPath, List<CatalogPage> generated)
+    {
+        if (!File.Exists(catalogPath))
+        {
+            return generated;
+        }
+
+        try
+        {
+            var existing = JsonSerializer.Deserialize<CatalogFile>(File.ReadAllText(catalogPath), JsonOptions);
+            if (existing is null)
+            {
+                return generated;
+            }
+
+            var result = new List<CatalogPage>(generated.Count);
+            foreach (var page in generated)
+            {
+                var previous = existing.Pages.FirstOrDefault(p =>
+                    string.Equals(p.Id, page.Id, StringComparison.OrdinalIgnoreCase));
+                if (previous is null)
+                {
+                    result.Add(page);
+                    continue;
+                }
+
+                var generatedIds = page.Tweaks.Select(t => t.Id).ToHashSet(StringComparer.OrdinalIgnoreCase);
+                var extras = previous.Tweaks.Where(t => !generatedIds.Contains(t.Id)).ToList();
+                result.Add(extras.Count == 0
+                    ? page
+                    : page with { Tweaks = page.Tweaks.Concat(extras).ToList() });
+            }
+
+            return result;
+        }
+        catch
+        {
+            return generated;
+        }
     }
 
     private static string ResolveRepositoryRoot(string[] args)

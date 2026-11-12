@@ -3,7 +3,7 @@
 [![Version](https://img.shields.io/badge/version-0.2.5-2f81f7?style=for-the-badge)](../../releases/latest)
 [![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?style=for-the-badge&logo=windows)](https://www.microsoft.com/windows)
 [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/)
-[![Tweaks](https://img.shields.io/badge/tweaks-295-22C55E?style=for-the-badge)](docs/FEATURE_MATRIX.md)
+[![Tweaks](https://img.shields.io/badge/tweaks-234-22C55E?style=for-the-badge)](docs/FEATURE_MATRIX.md)
 [![License](https://img.shields.io/badge/license-MIT-8B5CF6?style=for-the-badge)](LICENSE)
 
 A Windows 10/11 x64 tweak and system utility toolbox. This repository is the C#/.NET 8 rewrite of the Electron-based 0.2.0 app.
@@ -14,11 +14,13 @@ A Windows 10/11 x64 tweak and system utility toolbox. This repository is the C#/
 
 AtomToolBox puts the tweaks, maintenance tools and system controls from 0.2.0 in one desktop app. The rewrite uses WPF and Win32 APIs instead of Electron, Node and a web view. Tweaks are stored in a typed catalog, registry changes are read back after they are written, and changes made through the app are recorded in History.
 
-The four entries in the ADVANCED group are still locked. They are part of Atom Optimizer and open a PRO prompt instead of a tool page.
+The four entries in the ADVANCED group are still PRO-tagged pages. They open the Atom Optimizer prompt and no longer have a hidden PRO tweak catalog behind them. All 234 tweak entries in this build are free.
 
 ## What changed in 0.2.5
 
 The main change is the rewrite itself. The app is now one native process, opens faster than the Electron build and does not ship a browser runtime.
+
+The old 79-entry PRO catalog was removed. Twelve useful entries were moved into the free pages, and six WinUtil parity tweaks were added: svchost splitting, BitLocker, Reserved Storage, device companion blocking, full Delivery Optimization disable, and a full MPO disable. The PRO-tagged pages remain as upgrade placeholders only.
 
 Power Plans was cut back to plan switching. The settings editor, timer controls and create/import/export/delete actions are gone. The page lists the installed Windows schemes, shows the active one and lets you switch with one click. All 20 ready-made plans from 0.2.0 are still included. Applying one imports it once, caches the GUID and activates it.
 
@@ -102,7 +104,7 @@ The generated catalog, plans, shortcuts and debloat data are committed. To rebui
 
 ## QA
 
-The release build passes the engine self-test: 295 tweaks across 10 pages, 216 free tweaks, 20 ready-made plans, 85 shortcuts in 9 categories, 4 installed power schemes and 18 context-menu entries. The registry write check is skipped in sandboxes that block HKCU writes.
+The release build passes the engine self-test: 234 tweaks across 8 pages, 20 ready-made plans, 85 shortcuts in 9 categories, 4 installed power schemes and 18 context-menu entries. The registry write check is skipped in sandboxes that block HKCU writes.
 
 The UI smoke test opens all 21 pages through UI Automation and checks for dispatcher exceptions. Theme switching and page transitions were tested on the reference VM. The installer was tested by extracting its payload, installing to a temporary directory and running the uninstaller. Shortcut and HKLM writes need an interactive elevated session, so they remain part of the release checklist.
 

@@ -34,7 +34,7 @@ target machine's SDK cannot resolve multi-project MSBuild graphs.
 
 `tools/Atom.CatalogBuilder` is a development-time compiler:
 
-1. Reads the legacy `src/config/*.json` files (295 tweaks across ten pages).
+1. Reads the legacy free `src/config/*.json` files (216 tweaks across eight pages).
 2. Reads the sibling `.bat` scripts.
 3. Parses `reg add/delete`, `sc`, `powercfg`, `netsh`, `bcdedit`, `powershell` and simple
    process invocations into `TweakAction` records.
@@ -45,7 +45,9 @@ target machine's SDK cannot resolve multi-project MSBuild graphs.
 
 The generated file is checked in. `tools/catalog-report.txt` records coverage by action kind
 and lists every fallback with its reason. At runtime the catalog is validated (known action
-kinds, unique ids, page shape) and the SHA-256 is verified at startup.
+kinds, unique ids, page shape) and the SHA-256 is verified at startup. The builder preserves
+hand-maintained entries already present in `tweaks.json`; the committed catalog currently adds
+the 12 promoted and 6 WinUtil-parity tweaks on top of the 216 legacy free entries.
 
 ## Execution and verification
 
@@ -56,7 +58,7 @@ service, `powercfg` or a boot configuration verify with the legacy check command
 checks only run on demand (`CHECK STATE`), keeping page loads instant.
 
 `TweakService.VerifyPageAsync` treats the two classes differently: native checks run with a
-parallelism of 16, shell checks with a parallelism of 2. On a normal machine a full 79-tweak
+parallelism of 16, shell checks with a parallelism of 2. On a normal machine a full 90-tweak
 page scan completes in a few hundred milliseconds.
 
 ## Threading
