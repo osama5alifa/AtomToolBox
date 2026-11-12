@@ -1,5 +1,11 @@
 # AtomToolBox
 
+[![Version](https://img.shields.io/badge/version-0.2.5-2f81f7?style=for-the-badge)](../../releases/latest)
+[![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?style=for-the-badge&logo=windows)](https://www.microsoft.com/windows)
+[![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/)
+[![Tweaks](https://img.shields.io/badge/tweaks-295-22C55E?style=for-the-badge)](docs/FEATURE_MATRIX.md)
+[![License](https://img.shields.io/badge/license-MIT-8B5CF6?style=for-the-badge)](LICENSE)
+
 A Windows 10/11 x64 tweak and system utility toolbox. This repository is the C#/.NET 8 rewrite of the Electron-based 0.2.0 app.
 
 **Version:** 0.2.5
