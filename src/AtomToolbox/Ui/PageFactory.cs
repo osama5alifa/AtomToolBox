@@ -54,24 +54,24 @@ public sealed class PageFactory(
             "history" => new HistoryViewModel(history, toast),
             "settings" => new SettingsViewModel(settings, state, audit, catalog, environment,
                 theme => _shell?.ApplyThemeAsync(theme) ?? Task.CompletedTask, toast),
-            "advpower" => Pro("ADVANCED POWER CONFIGURATOR", "Deep powercfg editing, hidden settings and per-setting AC/DC control.", environment, toast),
-            "winupdate" => Pro("WINDOWS UPDATE", "Pause control, update policies, driver blocking and target release pinning.", environment, toast),
-            "dns" => Pro("DNS OPTIMIZER", "Per-adapter DNS presets, custom resolvers and DHCP reset.", environment, toast),
-            "drivers" => Pro("DRIVER HUB", "Driver inventory, problem devices and update tracking.", environment, toast),
-            "optimizer" => Pro("ATOM OPTIMIZER", "The advanced toolkit: every hidden setting, one place.", environment, toast),
+            "advpower" => Pro("ADVANCED POWER CONFIGURATOR", environment, toast),
+            "winupdate" => Pro("WINDOWS UPDATE", environment, toast),
+            "dns" => Pro("DNS OPTIMIZER", environment, toast),
+            "drivers" => Pro("DRIVER HUB", environment, toast),
+            "optimizer" => Pro("ATOM OPTIMIZER", environment, toast),
             _ => null
         };
     }
 
-    private static PageViewModel Pro(string title, string description, IEnvironmentService environment, Action<string, string?> toast) =>
-        new ProGateViewModel(title, description, environment, toast);
+    private static PageViewModel Pro(string title, IEnvironmentService environment, Action<string, string?> toast) =>
+        new ProGateViewModel(title, environment, toast);
 }
 
 public sealed class ProGateViewModel : PageViewModel
 {
     private const string OptimizerUrl = "https://www.atom-os.com/optimizer";
 
-    public ProGateViewModel(string title, string description, IEnvironmentService environment, Action<string, string?> toast)
+    public ProGateViewModel(string title, IEnvironmentService environment, Action<string, string?> toast)
     {
         Title = title;
         CountText = "(PRO)";
@@ -91,18 +91,5 @@ public sealed class ProGateViewModel : PageViewModel
                 toast("COULD NOT OPEN BROWSER", ex.Message);
             }
         })));
-
-        Sections.Add(new PageSectionViewModel
-        {
-            IsCard = true,
-            Items =
-            [
-                new MessageViewModel { Text = description },
-                new MessageViewModel
-                {
-                    Text = "The COMMUNITY build keeps this boundary intact: the page loads, but no privileged operation is available without a valid PRO licence."
-                }
-            ]
-        });
     }
 }
