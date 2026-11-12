@@ -95,6 +95,12 @@ The installer writes to `%ProgramFiles%\AtomToolBox`, creates a public desktop s
 Start Menu shortcut, and adds an AtomToolBox entry to Apps & Features. User settings, history and
 backups stay in `%LOCALAPPDATA%\AtomToolBox` when the app is uninstalled.
 
+### Portable fallback
+
+If the installer reports a temp-folder error, download `AtomToolbox-Portable-0.2.5.zip` from the
+same release, extract it into a folder, and run `Atomtoolbox.exe` as administrator. The portable
+package does not use an installer or a temp folder.
+
 ## Build
 
 Requirements: Windows x64, the .NET 8 SDK, and NSIS 3.x for the `Setup` task.
