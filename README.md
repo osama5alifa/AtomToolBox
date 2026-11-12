@@ -4,8 +4,6 @@ A Windows 10/11 x64 tweak and system utility toolbox. This repository is the C#/
 
 **Version:** 0.2.5
 
-**Repository:** https://github.com/osama5alifa/AtomToolBox
-
 ## Overview
 
 AtomToolBox puts the tweaks, maintenance tools and system controls from 0.2.0 in one desktop app. The rewrite uses WPF and Win32 APIs instead of Electron, Node and a web view. Tweaks are stored in a typed catalog, registry changes are read back after they are written, and changes made through the app are recorded in History.
