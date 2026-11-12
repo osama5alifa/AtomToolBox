@@ -97,83 +97,55 @@ switch ($Task) {
         if (Test-Path -LiteralPath $stage) { Remove-Item -LiteralPath $stage -Recurse -Force }
         New-Item -ItemType Directory -Path $stage -Force | Out-Null
 
-        Write-Host 'Staging a flat IExpress payload...' -ForegroundColor Cyan
-        Copy-Item -Path (Join-Path $selfContained '*') -Destination $stage -Force
-        foreach ($file in @('setup.cmd', 'setup.ps1', 'uninstall.ps1')) {
+        Write-Host 'Staging 7-Zip SFX payload...' -ForegroundColor Cyan
+        $payload = Join-Path $stage 'payload'
+        New-Item -ItemType Directory -Path $payload -Force | Out-Null
+        Copy-Item -Path (Join-Path $selfContained '*') -Destination $payload -Recurse -Force
+        foreach ($file in @('setup.cmd', 'setup.ps1', 'uninstall.ps1', 'config.txt')) {
             Copy-Item -LiteralPath (Join-Path $root "installer\$file") -Destination (Join-Path $stage $file) -Force
         }
 
-        $files = Get-ChildItem -LiteralPath $stage -File |
-            Where-Object { $_.Name -ne 'install.sed' } |
-            Sort-Object Name
-        $strings = New-Object System.Collections.Generic.List[string]
-        $sources = New-Object System.Collections.Generic.List[string]
-        for ($i = 0; $i -lt $files.Count; $i++) {
-            $strings.Add(('FILE{0}="{1}"' -f $i, $files[$i].Name))
-            $sources.Add(('%FILE{0}%=' -f $i))
+        $module = Join-Path $root 'installer\7zSD.sfx'
+        if (-not (Test-Path -LiteralPath $module)) { throw 'installer\7zSD.sfx is missing.' }
+        $branded = Join-Path $stage '7zSD-branded.sfx'
+        Copy-Item -LiteralPath $module -Destination $branded -Force
+        $brander = Join-Path $root 'tools\Atom.ResourceTransfer\Atom.ResourceTransfer.csproj'
+        & $dotnet run --project $brander -c Release -- --source $appExe --target $branded
+        if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $branded)) {
+            throw 'Could not brand the 7-Zip installer module.'
         }
 
-        $sed = @"
-[Version]
-Class=IEXPRESS
-SEDVersion=3
-[Options]
-PackagePurpose=InstallApp
-ShowInstallProgramWindow=0
-HideExtractAnimation=1
-UseLongFileName=1
-InsideCompressed=1
-CAB_FixedSize=0
-CAB_ResvCodeSigning=0
-RebootMode=N
-InstallPrompt=
-DisplayLicense=
-FinishMessage=
-TargetName=$stage\AtomToolbox-Setup.exe
-FriendlyName=AtomToolBox $version
-AppLaunched=setup.cmd
-PostInstallCmd=<None>
-AdminQuietInstCmd=
-UserQuietInstCmd=
-SourceFiles=SourceFiles
-[Strings]
-$($strings -join "`r`n")
-[SourceFiles]
-SourceFiles0=$stage\
-[SourceFiles0]
-$($sources -join "`r`n")
-"@
-        $sedPath = Join-Path $stage 'install.sed'
-        [IO.File]::WriteAllText($sedPath, $sed, [Text.ASCIIEncoding]::new())
-
-        Write-Host 'Building the single-file installer with IExpress...' -ForegroundColor Cyan
-        $iexpress = Join-Path $env:WINDIR 'System32\iexpress.exe'
-        if (-not (Test-Path -LiteralPath $iexpress)) {
-            throw 'IExpress is not available on this Windows installation.'
+        $sevenZip = Join-Path $env:ProgramFiles '7-Zip\7z.exe'
+        if (-not (Test-Path -LiteralPath $sevenZip)) {
+            $sevenZip = Join-Path ${env:ProgramFiles(x86)} '7-Zip\7z.exe'
         }
-        $process = Start-Process -FilePath $iexpress -ArgumentList @('/N', '/Q', $sedPath) -Wait -PassThru
-        if ($process.ExitCode -ne 0) {
-            throw "IExpress exited with code $($process.ExitCode)."
-        }
+        if (-not (Test-Path -LiteralPath $sevenZip)) { throw '7-Zip was not found.' }
 
-        $built = Join-Path $stage 'AtomToolbox-Setup.exe'
-        if (-not (Test-Path -LiteralPath $built)) {
-            throw 'IExpress did not produce AtomToolbox-Setup.exe.'
-        }
-
+        Write-Host 'Building the 7-Zip SFX installer...' -ForegroundColor Cyan
         if (Test-Path -LiteralPath $setupExe) { Remove-Item -LiteralPath $setupExe -Force }
-        Copy-Item -LiteralPath $built -Destination $setupExe -Force
-
+        $archive = Join-Path $stage 'payload.7z'
+        Push-Location $stage
         try {
-            $brander = Join-Path $root 'tools\Atom.ResourceTransfer\Atom.ResourceTransfer.csproj'
-            & $dotnet run --project $brander -c Release -- --source $appExe --target $setupExe
-            if ($LASTEXITCODE -eq 0) {
-                Write-Host 'Installer branded with the AtomToolBox icon and version.' -ForegroundColor DarkGray
-            }
-        } catch {
-            Write-Warning "Installer branding skipped: $($_.Exception.Message)"
+            & $sevenZip a -t7z -mx=9 -mmt=on $archive 'setup.cmd' 'setup.ps1' 'uninstall.ps1' 'payload'
+            if ($LASTEXITCODE -ne 0) { throw "7-Zip archive exited with code $LASTEXITCODE" }
+        } finally {
+            Pop-Location
         }
+        if (-not (Test-Path -LiteralPath $archive)) { throw 'The payload archive was not created.' }
 
+        # 7zSD expects: SFX stub + config.txt + archive.7z, concatenated.
+        $output = [IO.File]::Create($setupExe)
+        try {
+            foreach ($part in @($branded, (Join-Path $root 'installer\config.txt'), $archive)) {
+                $input = [IO.File]::OpenRead($part)
+                try { $input.CopyTo($output) } finally { $input.Dispose() }
+            }
+        } finally {
+            $output.Dispose()
+        }
+        if (Test-Path -LiteralPath $stage) { Remove-Item -LiteralPath $stage -Recurse -Force }
+
+        if (-not (Test-Path -LiteralPath $setupExe)) { throw 'The installer executable was not created.' }
         $latestSetup = Join-Path $root 'publish\AtomToolbox-Setup.exe'
         if (Test-Path -LiteralPath $latestSetup) { Remove-Item -LiteralPath $latestSetup -Force }
         try {
@@ -183,7 +155,6 @@ $($sources -join "`r`n")
         }
 
         $sizeMb = [math]::Round((Get-Item -LiteralPath $setupExe).Length / 1MB, 1)
-        Remove-Item -LiteralPath $stage -Recurse -Force
         Write-Host "Installer ready: $setupExe ($sizeMb MB)" -ForegroundColor Green
         Write-Host 'It bundles the .NET 8 runtime; no download or prerequisite is required.' -ForegroundColor Green
         break

@@ -85,7 +85,7 @@ pages remain as upgrade placeholders.
 
 Download the current installer from
 [GitHub Releases](https://github.com/osama5alifa/AtomToolBox/releases/latest). The file is about
-51 MB and is not code-signed yet, so Windows SmartScreen may show a warning.
+44 MB and is not code-signed yet, so Windows SmartScreen may show a warning.
 
 You can install over an existing 0.2.0 Electron installation. Setup removes the old
 `C:\Program Files\AtomToolBox` directory and the old uninstall entry before it copies the new
@@ -106,8 +106,7 @@ Requirements: Windows x64 and the .NET 8 SDK.
 ./build.ps1 -Task Setup        # self-contained installer
 ```
 
-`Setup` publishes a self-contained `win-x64` build and packages it with the IExpress tool that
-ships with Windows. The output is `publish/AtomToolbox-Setup.exe`, with a versioned copy at
+`Setup` publishes a self-contained `win-x64` build and packages it with the 7-Zip SFX installer module. The output is `publish/AtomToolbox-Setup.exe`, with a versioned copy at
 `publish/AtomToolbox-Setup-0.2.5.exe`. The .NET 8 `win-x64` runtime packs must be present in the
 NuGet cache; after that, the build does not need a network connection.
 

@@ -1,0 +1,6 @@
+;!@Install@!UTF-8!
+Title="AtomToolBox 0.2.5 Setup"
+BeginPrompt="Install AtomToolBox 0.2.5 on this PC?"
+Progress="yes"
+RunProgram="setup.cmd"
+;!@InstallEnd@!
