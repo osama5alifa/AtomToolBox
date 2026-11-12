@@ -1,4 +1,4 @@
-# AtomToolBox
+<h1 align="center">AtomToolBox</h1>
 
 [![Version](https://img.shields.io/badge/version-0.2.5-2f81f7?style=for-the-badge)](../../releases/latest)
 [![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?style=for-the-badge&logo=windows)](https://www.microsoft.com/windows)
