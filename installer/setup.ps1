@@ -5,13 +5,19 @@
 #>
 [CmdletBinding()]
 param(
-    [string]$InstallDir = (Join-Path $env:ProgramFiles 'AtomToolBox'),
+    [string]$InstallDir = '',
     [switch]$NoElevate,
     [switch]$SkipShellIntegration,
     [switch]$Quiet
 )
 
 $ErrorActionPreference = 'Stop'
+if ([string]::IsNullOrWhiteSpace($InstallDir)) {
+    $InstallDir = if ($env:ATOM_INSTALL_DIR) { $env:ATOM_INSTALL_DIR } else { Join-Path $env:ProgramFiles 'AtomToolBox' }
+}
+if ($env:ATOM_SKIP_SHELL -eq '1') { $SkipShellIntegration = $true }
+if ($env:ATOM_NO_ELEVATE -eq '1') { $NoElevate = $true }
+if ($env:ATOM_QUIET -eq '1') { $Quiet = $true }
 $logPath = Join-Path $env:TEMP 'AtomToolbox-Setup.log'
 
 function Write-Step([string]$message) {
@@ -97,6 +103,9 @@ try {
 
     Write-Step 'Stopping any running AtomToolBox instance...'
     Get-Process -Name AtomToolbox -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+    Get-Process -ErrorAction SilentlyContinue | Where-Object {
+        try { $_.Path -and $_.Path.StartsWith($InstallDir, [StringComparison]::OrdinalIgnoreCase) } catch { $false }
+    } | Stop-Process -Force -ErrorAction SilentlyContinue
     Start-Sleep -Milliseconds 500
 
     # Remove the legacy Electron uninstall registration if this is an in-place upgrade.
@@ -109,15 +118,30 @@ try {
     }
 
     Write-Step 'Preparing installation directory...'
+    $backupDir = $null
     if (Test-Path -LiteralPath $InstallDir) {
+        $removed = $false
         for ($attempt = 0; $attempt -lt 5; $attempt++) {
             try {
                 Remove-Item -LiteralPath $InstallDir -Recurse -Force -ErrorAction Stop
+                $removed = $true
                 break
             } catch {
-                if ($attempt -eq 4) { throw }
-                Start-Sleep -Milliseconds 400
+                if ($attempt -eq 4) {
+                    $backupDir = "$InstallDir.old-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+                    try {
+                        Move-Item -LiteralPath $InstallDir -Destination $backupDir -ErrorAction Stop
+                        Write-Step "Old installation moved to $backupDir"
+                    } catch {
+                        throw "Could not replace $InstallDir. Close AtomToolBox (including the old 0.2.0 app), then retry. $($_.Exception.Message)"
+                    }
+                } else {
+                    Start-Sleep -Milliseconds 400
+                }
             }
+        }
+        if (-not $removed -and -not $backupDir) {
+            throw "Could not replace $InstallDir."
         }
     }
     New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
@@ -191,6 +215,9 @@ try {
         Set-ItemProperty -Path $appPathKey -Name 'Path' -Value $InstallDir
     }
 
+    if ($backupDir) {
+        Write-Step "Previous installation kept at $backupDir"
+    }
     Write-Step 'Installation complete.'
     Show-Message ("AtomToolBox 0.2.5 is installed.{0}{0}Desktop and Start Menu shortcuts were created." -f [Environment]::NewLine) 'AtomToolBox Setup'
     exit 0

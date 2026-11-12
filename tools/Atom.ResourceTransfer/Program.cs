@@ -30,7 +30,7 @@ if (sourceModule == IntPtr.Zero)
 try
 {
     var copied = 0;
-    foreach (var type in new[] { 3, 14, 16 }) // RT_ICON, RT_GROUP_ICON, RT_VERSION
+    foreach (var type in new[] { 3, 14, 16, 24 }) // RT_ICON, RT_GROUP_ICON, RT_VERSION, RT_MANIFEST
     {
         var entries = ReadEntries(sourceModule, type);
         if (entries.Count == 0)
