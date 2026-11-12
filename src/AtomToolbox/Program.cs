@@ -100,6 +100,7 @@ internal sealed class AtomApplication : System.Windows.Application
             probe,
             settings,
             integrity,
+            environment,
             pages,
             theme =>
             {

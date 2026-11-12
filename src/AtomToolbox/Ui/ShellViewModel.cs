@@ -44,6 +44,7 @@ public sealed class ShellViewModel : ObservableObject
     private readonly ISettingsStore _settings;
     private readonly IIntegrityService _integrity;
     private readonly PageFactory _pages;
+    private readonly IEnvironmentService _environment;
     private readonly Func<AppTheme, Task> _themeApplier;
 
     private PageViewModel? _currentPage;
@@ -68,6 +69,7 @@ public sealed class ShellViewModel : ObservableObject
         ISystemProbe probe,
         ISettingsStore settings,
         IIntegrityService integrity,
+        IEnvironmentService environment,
         PageFactory pages,
         Func<AppTheme, Task> themeApplier)
     {
@@ -76,6 +78,7 @@ public sealed class ShellViewModel : ObservableObject
         _settings = settings;
         _integrity = integrity;
         _pages = pages;
+        _environment = environment;
         _themeApplier = themeApplier;
 
         NavigateCommand = new RelayCommand(parameter => Navigate((parameter as NavItemViewModel)?.Id));
@@ -204,6 +207,22 @@ public sealed class ShellViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(pageId))
         {
+            return;
+        }
+
+        if (string.Equals(pageId, "optimizer", StringComparison.OrdinalIgnoreCase))
+        {
+            try
+            {
+                const string optimizerUrl = "https://www.atom-os.com/optimizer";
+                _environment.OpenUrl(optimizerUrl);
+                ShowToast("OPENING ATOM OPTIMIZER", optimizerUrl);
+            }
+            catch (Exception ex)
+            {
+                ShowToast("COULD NOT OPEN BROWSER", ex.Message);
+            }
+
             return;
         }
 
@@ -374,6 +393,7 @@ public sealed class ShellViewModel : ObservableObject
             new NavItemViewModel { Id = "winupdate", Label = "WINDOWS UPDATE", IsLocked = true },
             new NavItemViewModel { Id = "dns", Label = "DNS OPTIMIZER", IsLocked = true },
             new NavItemViewModel { Id = "drivers", Label = "DRIVER HUB", IsLocked = true },
+            new NavItemViewModel { Id = "optimizer", Label = "GET ATOM OPTIMIZER →", IsCallToAction = true, IsLocked = true },
         ]
     };
 
