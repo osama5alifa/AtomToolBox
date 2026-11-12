@@ -10,6 +10,9 @@ dist/
 # Installer staging
 installer/stage/
 
+# Local build tools
+tools/NSIS/
+
 # Local data and QA artifacts
 *.log
 artifacts/

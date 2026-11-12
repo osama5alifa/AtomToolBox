@@ -85,11 +85,11 @@ pages remain as upgrade placeholders.
 
 Download the current installer from
 [GitHub Releases](https://github.com/osama5alifa/AtomToolBox/releases/latest). The file is about
-44 MB and is not code-signed yet, so Windows SmartScreen may show a warning.
+45 MB and is not code-signed yet, so Windows SmartScreen may show a warning.
 
-You can install over an existing 0.2.0 Electron installation. Setup removes the old
-`C:\Program Files\AtomToolBox` directory and the old uninstall entry before it copies the new
-files. Settings from the Electron app are not imported.
+You can install over an existing 0.2.0 Electron installation. Setup closes the old app, moves
+`C:\Program Files\AtomToolBox` to a `.old-*` folder if it cannot be replaced, and removes the old
+uninstall entry before copying the new files. Settings from the Electron app are not imported.
 
 The installer writes to `%ProgramFiles%\AtomToolBox`, creates a public desktop shortcut and a
 Start Menu shortcut, and adds an AtomToolBox entry to Apps & Features. User settings, history and
@@ -97,7 +97,7 @@ backups stay in `%LOCALAPPDATA%\AtomToolBox` when the app is uninstalled.
 
 ## Build
 
-Requirements: Windows x64 and the .NET 8 SDK.
+Requirements: Windows x64, the .NET 8 SDK, and NSIS 3.x for the `Setup` task.
 
 ```powershell
 ./build.ps1 -Task Build        # compile
@@ -106,7 +106,7 @@ Requirements: Windows x64 and the .NET 8 SDK.
 ./build.ps1 -Task Setup        # self-contained installer
 ```
 
-`Setup` publishes a self-contained `win-x64` build and packages it with the 7-Zip SFX installer module. The output is `publish/AtomToolbox-Setup.exe`, with a versioned copy at
+`Setup` publishes a self-contained `win-x64` build and builds it with NSIS. The output is `publish/AtomToolbox-Setup.exe`, with a versioned copy at
 `publish/AtomToolbox-Setup-0.2.5.exe`. The .NET 8 `win-x64` runtime packs must be present in the
 NuGet cache; after that, the build does not need a network connection.
 
@@ -128,7 +128,7 @@ src/AtomToolbox/
   Program.cs                    Composition root, elevation and single instance
   SelfTest.cs                   Headless engine diagnostic
 
-installer/                      Setup and uninstall scripts
+installer/                      NSIS installer script and helper scripts
 tools/
   Atom.CatalogBuilder/          Builds the catalog from the old JSON and scripts
   Atom.LicenseIssuer/           Offline RSA licence tooling

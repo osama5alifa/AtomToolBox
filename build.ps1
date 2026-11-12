@@ -66,11 +66,17 @@ switch ($Task) {
 
     'Setup' {
         $selfContained = Join-Path $root 'publish\self-contained'
-        $stage = Join-Path $env:TEMP ('AtomToolbox-install-' + [Guid]::NewGuid().ToString('N'))
         $setupExe = Join-Path $root "publish\AtomToolbox-Setup-$version.exe"
-
-        if ($stage -match ' ') {
-            $stage = Join-Path $env:PUBLIC ('AtomToolbox-install-' + [Guid]::NewGuid().ToString('N'))
+        $nsisScript = Join-Path $root 'installer\AtomToolbox.nsi'
+        $makensis = Join-Path $root 'tools\NSIS\nsis-3.11\makensis.exe'
+        if (-not (Test-Path -LiteralPath $makensis)) {
+            $makensis = Join-Path ${env:ProgramFiles(x86)} 'NSIS\makensis.exe'
+        }
+        if (-not (Test-Path -LiteralPath $makensis)) {
+            $makensis = Join-Path $env:ProgramFiles 'NSIS\makensis.exe'
+        }
+        if (-not (Test-Path -LiteralPath $makensis)) {
+            throw 'NSIS was not found. Install NSIS 3.x or place it in tools\NSIS\nsis-3.11.'
         }
 
         Write-Host 'Restoring the self-contained win-x64 runtime...' -ForegroundColor Cyan
@@ -83,78 +89,32 @@ switch ($Task) {
             '-p:DebugType=None', '-p:DebugSymbols=false', '--no-restore', '-o', $selfContained) + $common)
 
         $appExe = Join-Path $selfContained 'AtomToolbox.exe'
-        if (-not (Test-Path -LiteralPath $appExe)) {
-            throw "Self-contained publish did not produce AtomToolbox.exe ($appExe)."
-        }
-
-        # Never ship a debug/no-elevation manifest by accident.
+        if (-not (Test-Path -LiteralPath $appExe)) { throw 'Self-contained publish did not produce AtomToolbox.exe.' }
         $bytes = [IO.File]::ReadAllBytes($appExe)
         $latin = [Text.Encoding]::GetEncoding(1252).GetString($bytes)
         if ($latin.IndexOf('requireAdministrator') -lt 0) {
-            throw 'The published application does not request administrator rights (wrong manifest).'
+            throw 'The published application does not request administrator rights.'
         }
 
-        if (Test-Path -LiteralPath $stage) { Remove-Item -LiteralPath $stage -Recurse -Force }
-        New-Item -ItemType Directory -Path $stage -Force | Out-Null
-
-        Write-Host 'Staging 7-Zip SFX payload...' -ForegroundColor Cyan
-        $payload = Join-Path $stage 'payload'
-        New-Item -ItemType Directory -Path $payload -Force | Out-Null
-        Copy-Item -Path (Join-Path $selfContained '*') -Destination $payload -Recurse -Force
-        foreach ($file in @('setup.cmd', 'setup.ps1', 'uninstall.ps1', 'config.txt')) {
-            Copy-Item -LiteralPath (Join-Path $root "installer\$file") -Destination (Join-Path $stage $file) -Force
-        }
-
-        $module = Join-Path $root 'installer\7zSD.sfx'
-        if (-not (Test-Path -LiteralPath $module)) { throw 'installer\7zSD.sfx is missing.' }
-        $branded = Join-Path $stage '7zSD-branded.sfx'
-        Copy-Item -LiteralPath $module -Destination $branded -Force
-        $brander = Join-Path $root 'tools\Atom.ResourceTransfer\Atom.ResourceTransfer.csproj'
-        & $dotnet run --project $brander -c Release -- --source $appExe --target $branded
-        if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $branded)) {
-            throw 'Could not brand the 7-Zip installer module.'
-        }
-
-        $sevenZip = Join-Path $env:ProgramFiles '7-Zip\7z.exe'
-        if (-not (Test-Path -LiteralPath $sevenZip)) {
-            $sevenZip = Join-Path ${env:ProgramFiles(x86)} '7-Zip\7z.exe'
-        }
-        if (-not (Test-Path -LiteralPath $sevenZip)) { throw '7-Zip was not found.' }
-
-        Write-Host 'Building the 7-Zip SFX installer...' -ForegroundColor Cyan
+        Get-Process -Name AtomToolbox-Setup -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
         if (Test-Path -LiteralPath $setupExe) { Remove-Item -LiteralPath $setupExe -Force }
-        $archive = Join-Path $stage 'payload.7z'
-        Push-Location $stage
+        Write-Host 'Building the NSIS installer...' -ForegroundColor Cyan
+        Push-Location (Join-Path $root 'installer')
         try {
-            & $sevenZip a -t7z -mx=9 -mmt=on $archive 'setup.cmd' 'setup.ps1' 'uninstall.ps1' 'payload'
-            if ($LASTEXITCODE -ne 0) { throw "7-Zip archive exited with code $LASTEXITCODE" }
+            & $makensis "/DPAYLOAD=$selfContained" "/DOUTFILE=$setupExe" $nsisScript
+            if ($LASTEXITCODE -ne 0) { throw "makensis exited with code $LASTEXITCODE" }
         } finally {
             Pop-Location
         }
-        if (-not (Test-Path -LiteralPath $archive)) { throw 'The payload archive was not created.' }
+        if (-not (Test-Path -LiteralPath $setupExe)) { throw 'NSIS did not produce the installer.' }
 
-        # 7zSD expects: SFX stub + config.txt + archive.7z, concatenated.
-        $output = [IO.File]::Create($setupExe)
-        try {
-            foreach ($part in @($branded, (Join-Path $root 'installer\config.txt'), $archive)) {
-                $input = [IO.File]::OpenRead($part)
-                try { $input.CopyTo($output) } finally { $input.Dispose() }
-            }
-        } finally {
-            $output.Dispose()
-        }
-        if (Test-Path -LiteralPath $stage) { Remove-Item -LiteralPath $stage -Recurse -Force }
-
-        if (-not (Test-Path -LiteralPath $setupExe)) { throw 'The installer executable was not created.' }
         $latestSetup = Join-Path $root 'publish\AtomToolbox-Setup.exe'
         if (Test-Path -LiteralPath $latestSetup) { Remove-Item -LiteralPath $latestSetup -Force }
-        try {
-            New-Item -ItemType HardLink -Path $latestSetup -Target $setupExe -ErrorAction Stop | Out-Null
-        } catch {
-            Copy-Item -LiteralPath $setupExe -Destination $latestSetup -Force
-        }
+        try { New-Item -ItemType HardLink -Path $latestSetup -Target $setupExe -ErrorAction Stop | Out-Null }
+        catch { Copy-Item -LiteralPath $setupExe -Destination $latestSetup -Force }
 
         $sizeMb = [math]::Round((Get-Item -LiteralPath $setupExe).Length / 1MB, 1)
+        Remove-Item -LiteralPath $selfContained -Recurse -Force
         Write-Host "Installer ready: $setupExe ($sizeMb MB)" -ForegroundColor Green
         Write-Host 'It bundles the .NET 8 runtime; no download or prerequisite is required.' -ForegroundColor Green
         break
