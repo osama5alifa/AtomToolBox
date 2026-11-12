@@ -61,7 +61,6 @@ public sealed class ShellViewModel : ObservableObject
     private string _toastSub = "";
     private bool _isToastVisible;
     private CancellationTokenSource? _toastSource;
-    private CancellationTokenSource? _searchSource;
     private bool _initialized;
 
     public ShellViewModel(
@@ -131,7 +130,7 @@ public sealed class ShellViewModel : ObservableObject
             {
                 return;
             }
-            ScheduleSearch(value);
+            RebuildSearch(value);
         }
     }
 
@@ -271,42 +270,6 @@ public sealed class ShellViewModel : ObservableObject
     }
 
     public event Action? PageReady;
-
-    private void ScheduleSearch(string text)
-    {
-        _searchSource?.Cancel();
-        _searchSource?.Dispose();
-
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            SearchResults.Clear();
-            IsSearchOpen = false;
-            Raise(nameof(HasSearchResults));
-            return;
-        }
-
-        var source = new CancellationTokenSource();
-        _searchSource = source;
-        var token = source.Token;
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await Task.Delay(80, token).ConfigureAwait(false);
-                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
-                {
-                    if (!token.IsCancellationRequested)
-                    {
-                        RebuildSearch(text);
-                    }
-                });
-            }
-            catch (OperationCanceledException)
-            {
-                // A newer keystroke replaced this search.
-            }
-        });
-    }
 
     private void RebuildSearch(string text)
     {
