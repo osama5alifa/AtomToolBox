@@ -6,6 +6,10 @@
 [![Tweaks](https://img.shields.io/badge/tweaks-234-22C55E?style=for-the-badge)](docs/FEATURE_MATRIX.md)
 [![License](https://img.shields.io/badge/license-MIT-8B5CF6?style=for-the-badge)](LICENSE)
 
+<p align="center">
+  <img src="docs/screenshots/dashboard-dark.png" alt="AtomToolBox dashboard" width="860">
+</p>
+
 AtomToolBox is a Windows 10/11 utility toolbox. It brings system tweaks, maintenance tools,
 shortcuts, startup control, context-menu management, power plans, app installation and backups
 into one desktop app.
