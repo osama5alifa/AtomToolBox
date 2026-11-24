@@ -24,6 +24,7 @@ public partial class MainWindow : Window
 
         ShellViewModel.WindowStateCommand += OnWindowStateCommand;
         _shell.PageReady += OnPageReady;
+        PreviewMouseDown += OnWindowPreviewMouseDown;
         Loaded += OnLoaded;
         Closed += OnClosed;
         StateChanged += (_, _) => UpdateMaximizeGlyph();
@@ -32,6 +33,16 @@ public partial class MainWindow : Window
         _headerTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(30) };
         _headerTimer.Tick += async (_, _) => await _shell.RefreshHeaderAsync();
         _headerTimer.Start();
+    }
+
+    private void OnWindowPreviewMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (SearchPopup.IsOpen && !SearchHost.IsMouseOver &&
+            (SearchPopup.Child == null || !SearchPopup.Child.IsMouseOver))
+        {
+            _shell.IsSearchOpen = false;
+            SearchPopup.IsOpen = false;
+        }
     }
 
     private void OnPageReady()
@@ -159,8 +170,11 @@ public partial class MainWindow : Window
 
     private void SearchList_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
     {
-        if (SearchList.SelectedItem is SearchResultViewModel result)
+        ListBoxItem? item = ItemsControl.ContainerFromElement(SearchList, e.OriginalSource as DependencyObject) as ListBoxItem;
+        SearchResultViewModel? result = (item?.DataContext ?? SearchList.SelectedItem) as SearchResultViewModel;
+        if (result is not null)
         {
+            e.Handled = true;
             OpenResult(result);
         }
     }

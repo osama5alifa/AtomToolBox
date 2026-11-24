@@ -63,7 +63,7 @@
                                VerticalAlignment="Center" IsHitTestVisible="False"
                                Visibility="{Binding SearchText, Converter={StaticResource EmptyToVisible}}" />
                     <Popup x:Name="SearchPopup" PlacementTarget="{Binding ElementName=SearchBox}"
-                           Placement="Bottom" IsOpen="{Binding IsSearchOpen}" StaysOpen="False"
+                           Placement="Bottom" IsOpen="{Binding IsSearchOpen}" StaysOpen="True"
                            AllowsTransparency="True" PopupAnimation="None" VerticalOffset="6">
                         <Border Width="420" Background="{DynamicResource Bg}" BorderBrush="{DynamicResource Border}"
                                 BorderThickness="1" MaxHeight="380">
