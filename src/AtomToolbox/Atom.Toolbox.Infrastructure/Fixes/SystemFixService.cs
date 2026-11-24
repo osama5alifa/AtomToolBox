@@ -104,6 +104,67 @@ public sealed class SystemFixService(
         }
     }
 
+    public Task<FixResult> RepairWindowsUpdateAsync(CancellationToken cancellationToken = default) =>
+        RunScriptAsync(WindowsUpdateScript, "Windows Update cache and services reset. Check for updates again.", cancellationToken);
+
+    public Task<FixResult> RepairWmiAsync(CancellationToken cancellationToken = default) =>
+        RunScriptAsync(WmiScript, "WMI repository checked and the service restarted.", cancellationToken);
+
+    public Task<FixResult> RepairStoreAsync(CancellationToken cancellationToken = default) =>
+        RunScriptAsync(StoreScript, "Microsoft Store services resets and the Store package refreshed.", cancellationToken);
+
+    public Task<FixResult> RepairAudioAsync(CancellationToken cancellationToken = default) =>
+        RunScriptAsync(AudioScript, "Audio services restarted and audio devices re-enabled.", cancellationToken);
+
+    public Task<FixResult> RepairPrintAsync(CancellationToken cancellationToken = default) =>
+        RunScriptAsync(PrintScript, "Print Spooler restarted and the spool folder cleared.", cancellationToken);
+
+    public Task<FixResult> RepairShellAsync(CancellationToken cancellationToken = default) =>
+        RunScriptAsync(ShellScript, "Explorer restarted and the icon, thumbnail and shell caches rebuilt.", cancellationToken);
+
+    public Task<FixResult> RepairSecurityAsync(CancellationToken cancellationToken = default) =>
+        RunScriptAsync(SecurityScript, "Windows Security services started and protection policies cleared.", cancellationToken);
+
+    public Task<FixResult> RepairTimeAsync(CancellationToken cancellationToken = default) =>
+        RunScriptAsync(TimeScript, "Windows Time service restarted and the clock resynchronized.", cancellationToken);
+
+    public Task<FixResult> RepairDevicesAsync(CancellationToken cancellationToken = default) =>
+        RunScriptAsync(DevicesScript, "Device tree rescanned and error devices re-enabled.", cancellationToken);
+
+    public Task<FixResult> RepairGamingAsync(CancellationToken cancellationToken = default) =>
+        RunScriptAsync(GamingScript, "Xbox and Gaming Services restored. Restart if a game still cannot sign in.", cancellationToken);
+
+    public async Task<FixResult> RepairComponentStoreAsync(CancellationToken cancellationToken = default)
+    {
+        var dism = await processes.RunAsync(new ProcessRequest(
+            "dism.exe",
+            new[] { "/Online", "/Cleanup-Image", "/RestoreHealth", "/NoRestart" },
+            Timeout: TimeSpan.FromMinutes(25)), cancellationToken).ConfigureAwait(false);
+        if (dism.TimedOut)
+        {
+            return FixResult.Fail("DISM timed out. Restart Windows and run the component repair again.");
+        }
+        if (!dism.Ok)
+        {
+            return FixResult.Fail(Clip("DISM failed: " + dism.Combined));
+        }
+
+        var sfc = await processes.RunAsync(new ProcessRequest(
+            "sfc.exe",
+            new[] { "/scannow" },
+            Timeout: TimeSpan.FromMinutes(20)), cancellationToken).ConfigureAwait(false);
+        if (sfc.TimedOut)
+        {
+            return FixResult.Fail("DISM completed but SFC timed out. Restart and run SFC again.");
+        }
+        if (!sfc.Ok)
+        {
+            return FixResult.Fail(Clip("SFC failed: " + sfc.Combined));
+        }
+
+        return FixResult.Success("Component store repaired and system files verified. Restart Windows.");
+    }
+
     private async Task<FixResult> RunScriptAsync(string script, string success, CancellationToken cancellationToken)
     {
         var result = await processes.RunAsync(
@@ -125,6 +186,12 @@ public sealed class SystemFixService(
         }
 
         return FixResult.Success(success);
+    }
+
+    private static string Clip(string text)
+    {
+        text = text.Trim();
+        return text.Length <= 220 ? text : text[..220] + "...";
     }
 
     private int PersistCurrentDisplayModes()
@@ -157,6 +224,144 @@ public sealed class SystemFixService(
 
         return count;
     }
+
+    private const string WindowsUpdateScript = """
+        $ErrorActionPreference = 'SilentlyContinue'
+        foreach ($name in @('wuauserv','bits','cryptsvc','msiserver','TrustedInstaller')) {
+            Stop-Service -Name $name -Force
+        }
+        Remove-Item -Path "$env:windir\SoftwareDistribution\*" -Recurse -Force
+        Remove-Item -Path "$env:windir\System32\catroot2\*" -Recurse -Force
+        Remove-Item -LiteralPath 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate' -Recurse -Force
+        Remove-Item -LiteralPath 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU' -Recurse -Force
+        foreach ($name in @('wuauserv','bits','cryptsvc','msiserver')) {
+            Set-Service -Name $name -StartupType Automatic
+            Start-Service -Name $name
+        }
+        exit 0
+        """;
+
+    private const string WmiScript = """
+        $ErrorActionPreference = 'SilentlyContinue'
+        & winmgmt.exe /verifyrepository | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            & winmgmt.exe /salvagerepository | Out-Null
+        }
+        Set-Service -Name Winmgmt -StartupType Automatic
+        Restart-Service -Name Winmgmt -Force
+        exit 0
+        """;
+
+    private const string StoreScript = """
+        $ErrorActionPreference = 'SilentlyContinue'
+        foreach ($name in @('AppXSvc','ClipSVC','InstallService','LicenseManager','TokenBroker')) {
+            Set-Service -Name $name -StartupType Automatic
+            Start-Service -Name $name
+        }
+        Get-AppxPackage -AllUsers *WindowsStore* | ForEach-Object {
+            Add-AppxPackage -DisableDevelopmentMode -Register (Join-Path $_.InstallLocation 'AppXManifest.xml') -ErrorAction SilentlyContinue
+        }
+        if (Get-Command Reset-AppxPackage -ErrorAction SilentlyContinue) {
+            Get-AppxPackage *WindowsStore* | Reset-AppxPackage
+        }
+        Start-Process wsreset.exe -ArgumentList '-i'
+        exit 0
+        """;
+
+    private const string AudioScript = """
+        $ErrorActionPreference = 'SilentlyContinue'
+        Set-Service -Name AudioEndpointBuilder -StartupType Automatic
+        Set-Service -Name Audiosrv -StartupType Automatic
+        Start-Service -Name AudioEndpointBuilder
+        Start-Service -Name Audiosrv
+        Get-PnpDevice -Class AudioEndpoint -Status Error | Enable-PnpDevice -Confirm:$false
+        Get-PnpDevice -Class Media -Status Error | Enable-PnpDevice -Confirm:$false
+        Get-Service RtkAudUService,RTKAudioService -ErrorAction SilentlyContinue | Start-Service
+        & pnputil.exe /scan-devices | Out-Null
+        exit 0
+        """;
+
+    private const string PrintScript = """
+        $ErrorActionPreference = 'SilentlyContinue'
+        Set-Service -Name Spooler -StartupType Automatic
+        Start-Service -Name Spooler
+        Stop-Service -Name Spooler -Force
+        Remove-Item -Path "$env:windir\System32\spool\PRINTERS\*" -Recurse -Force
+        Start-Service -Name Spooler
+        Get-PnpDevice -Class Printer -Status Error | Enable-PnpDevice -Confirm:$false
+        & pnputil.exe /scan-devices | Out-Null
+        exit 0
+        """;
+
+    private const string ShellScript = """
+        $ErrorActionPreference = 'SilentlyContinue'
+        Stop-Process -Name explorer -Force
+        $cache = "$env:LOCALAPPDATA\Microsoft\Windows\Explorer"
+        Remove-Item -Path "$cache\iconcache*" -Force
+        Remove-Item -Path "$cache\thumbcache*" -Force
+        Stop-Service -Name FontCache -Force
+        Remove-Item -Path "$env:windir\ServiceProfiles\LocalService\AppData\Local\FontCache\*" -Recurse -Force
+        Start-Service -Name FontCache
+        foreach ($pkg in @('Microsoft.Windows.ShellExperienceHost','Microsoft.Windows.StartMenuExperienceHost')) {
+            Get-AppxPackage -AllUsers -Name $pkg | ForEach-Object {
+                Add-AppxPackage -DisableDevelopmentMode -Register (Join-Path $_.InstallLocation 'AppXManifest.xml') -ErrorAction SilentlyContinue
+            }
+        }
+        & ie4uinit.exe -show
+        Start-Process explorer.exe
+        exit 0
+        """;
+
+    private const string SecurityScript = """
+        $ErrorActionPreference = 'SilentlyContinue'
+        foreach ($name in @('WinDefend','SecurityHealthService','wscsvc','MDCoreSvc','Sense')) {
+            Set-Service -Name $name -StartupType Automatic
+            Start-Service -Name $name
+        }
+        Remove-ItemProperty -LiteralPath 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender' -Name DisableAntiSpyware -Force
+        Remove-ItemProperty -LiteralPath 'HKLM:\SOFTWARE\Policies\Microsoft\Windows Defender' -Name DisableAntiVirus -Force
+        Set-MpPreference -DisableRealtimeMonitoring $false
+        Get-AppxPackage -AllUsers Microsoft.SecHealthUI | ForEach-Object {
+            Add-AppxPackage -DisableDevelopmentMode -Register (Join-Path $_.InstallLocation 'AppXManifest.xml') -ErrorAction SilentlyContinue
+        }
+        Start-Process 'windowsdefender://'
+        exit 0
+        """;
+
+    private const string TimeScript = """
+        $ErrorActionPreference = 'SilentlyContinue'
+        Set-Service -Name W32Time -StartupType Automatic
+        Start-Service -Name W32Time
+        & w32tm.exe /config /manualpeerlist:"time.windows.com,0x9" /syncfromflags:manual /update
+        & w32tm.exe /resync /force
+        exit 0
+        """;
+
+    private const string DevicesScript = """
+        $ErrorActionPreference = 'SilentlyContinue'
+        & pnputil.exe /scan-devices | Out-Null
+        Get-PnpDevice -PresentOnly -Status Error | Enable-PnpDevice -Confirm:$false
+        foreach ($name in @('DeviceInstall','PlugPlay','DsmSvc','DeviceAssociationService')) {
+            Set-Service -Name $name -StartupType Manual
+            Start-Service -Name $name
+        }
+        exit 0
+        """;
+
+    private const string GamingScript = """
+        $ErrorActionPreference = 'SilentlyContinue'
+        foreach ($name in @('XblAuthManager','XblGameSave','XboxNetApiSvc','XboxGipSvc','GamingServices')) {
+            Set-Service -Name $name -StartupType Manual
+            Start-Service -Name $name
+        }
+        Get-AppxPackage -AllUsers Microsoft.GamingServices | ForEach-Object {
+            Add-AppxPackage -DisableDevelopmentMode -Register (Join-Path $_.InstallLocation 'AppXManifest.xml') -ErrorAction SilentlyContinue
+        }
+        if (Get-Command Reset-AppxPackage -ErrorAction SilentlyContinue) {
+            Get-AppxPackage Microsoft.GamingServices | Reset-AppxPackage
+        }
+        exit 0
+        """;
 
     private const string SearchScript = """
         $ErrorActionPreference = 'SilentlyContinue'

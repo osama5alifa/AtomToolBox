@@ -12,8 +12,8 @@ public sealed class FixesViewModel : PageViewModel
     {
         _fixes = fixes;
         Title = "FIXES & REPAIRS";
-        CountText = "(7)";
-        Intro = "Targeted repairs for common Windows breakages. Read each card before running it; some repairs restart Explorer, reset networking or require a reboot.";
+        CountText = "(18)";
+        Intro = "Advanced repairs for custom Windows builds and broken system components. Read each card before running it; some repairs restart Explorer, reset networking, remove cached data or require a reboot.";
         ShowAdminWarning = true;
         HasConsole = false;
 
@@ -37,6 +37,43 @@ public sealed class FixesViewModel : PageViewModel
                     () => ConfirmThen("NVIDIA CONTROL PANEL",
                         "This restarts NVIDIA services and refreshes the Control Panel package.\n\nContinue?",
                         _fixes.RepairNvidiaAsync))
+            ]
+        });
+
+        Sections.Add(new PageSectionViewModel
+        {
+            IsCard = true,
+            Title = "CORE WINDOWS",
+            Items =
+            [
+                new ActionRowViewModel(
+                    "WINDOWS UPDATE",
+                    "Stops the update stack, removes the SoftwareDistribution and catroot2 caches, clears update policy blocks and starts wuauserv, BITS and cryptographic services again.",
+                    "RESET UPDATE",
+                    () => ConfirmThen("WINDOWS UPDATE",
+                        "This clears the downloaded update cache and restarts Windows Update services.\n\nContinue?",
+                        _fixes.RepairWindowsUpdateAsync)),
+                new ActionRowViewModel(
+                    "COMPONENT STORE / SFC",
+                    "Runs DISM RestoreHealth followed by System File Checker. Use this for corrupted system files, failed updates or a damaged component store. This can take 15–30 minutes.",
+                    "RUN REPAIR",
+                    () => ConfirmThen("COMPONENT STORE / SFC",
+                        "This can take 15–30 minutes and uses significant disk and CPU time.\n\nContinue?",
+                        _fixes.RepairComponentStoreAsync)),
+                new ActionRowViewModel(
+                    "WMI REPOSITORY",
+                    "Verifies the WMI repository, attempts a salvage if it is inconsistent and restarts the Windows Management Instrumentation service. Fixes many broken Settings and installer errors.",
+                    "RUN FIX",
+                    () => ConfirmThen("WMI REPOSITORY",
+                        "This checks and may salvage the WMI repository, then restarts the WMI service.\n\nContinue?",
+                        _fixes.RepairWmiAsync)),
+                new ActionRowViewModel(
+                    "WINDOWS SECURITY",
+                    "Starts Defender, Security Center and related services, removes anti-malware policy blocks, re-enables real-time monitoring and re-registers the Security app.",
+                    "RUN FIX",
+                    () => ConfirmThen("WINDOWS SECURITY",
+                        "This re-enables Windows Security services and real-time protection where policy allows.\n\nContinue?",
+                        _fixes.RepairSecurityAsync))
             ]
         });
 
@@ -68,7 +105,65 @@ public sealed class FixesViewModel : PageViewModel
                     {
                         var result = await _fixes.OpenMicrophoneAsync().ConfigureAwait(true);
                         return new ActionOutcome(result.Ok, result.Message);
-                    })
+                    }),
+                new ActionRowViewModel(
+                    "DEVICE RESCAN",
+                    "Rescans Plug and Play, re-enables every device reporting an error and starts the device installation services. Useful after driver cleanup or a stripped custom image.",
+                    "RESCAN",
+                    () => ConfirmThen("DEVICE RESCAN",
+                        "This rescans all devices and re-enables devices marked with an error.\n\nContinue?",
+                        _fixes.RepairDevicesAsync)),
+                new ActionRowViewModel(
+                    "TIME SYNC",
+                    "Restarts Windows Time, points it at time.windows.com and forces a clock resynchronization. Fixes broken certificates, sign-ins and update checks caused by clock drift.",
+                    "SYNC",
+                    () => ConfirmThen("TIME SYNC",
+                        "This changes the time source to time.windows.com and resynchronizes the clock.\n\nContinue?",
+                        _fixes.RepairTimeAsync))
+            ]
+        });
+
+        Sections.Add(new PageSectionViewModel
+        {
+            IsCard = true,
+            Title = "APPS, SHELL & MEDIA",
+            Items =
+            [
+                new ActionRowViewModel(
+                    "MICROSOFT STORE",
+                    "Starts the Store and AppX services, re-registers the Store package and clears its cache. Fixes Store pages that fail to load or apps that will not install.",
+                    "RUN FIX",
+                    () => ConfirmThen("MICROSOFT STORE",
+                        "This refreshes the Store package and clears its cache. The Store may close briefly.\n\nContinue?",
+                        _fixes.RepairStoreAsync)),
+                new ActionRowViewModel(
+                    "SHELL & ICON CACHE",
+                    "Restarts Explorer, rebuilds icon and thumbnail caches, clears the font cache and re-registers the shell and Start menu packages. Fixes blank icons and a frozen taskbar.",
+                    "REBUILD",
+                    () => ConfirmThen("SHELL & ICON CACHE",
+                        "Explorer will restart and the desktop will flash briefly.\n\nContinue?",
+                        _fixes.RepairShellAsync)),
+                new ActionRowViewModel(
+                    "AUDIO SERVICES",
+                    "Starts AudioEndpointBuilder and Audiosrv, re-enables audio devices in error and rescans for missing sound hardware. Fixes no-output and missing-device problems.",
+                    "RUN FIX",
+                    () => ConfirmThen("AUDIO SERVICES",
+                        "This restarts the Windows audio stack and re-enables audio devices.\n\nContinue?",
+                        _fixes.RepairAudioAsync)),
+                new ActionRowViewModel(
+                    "PRINT SPOOLER",
+                    "Starts the Print Spooler, clears stuck print jobs, re-enables printer devices and rescans the device tree. Fixes printers that disappear or jobs that never leave the queue.",
+                    "RUN FIX",
+                    () => ConfirmThen("PRINT SPOOLER",
+                        "This restarts the spooler and deletes all queued print jobs.\n\nContinue?",
+                        _fixes.RepairPrintAsync)),
+                new ActionRowViewModel(
+                    "XBOX & GAMING SERVICES",
+                    "Restores Xbox authentication, save, networking and Gaming Services packages. Use this when the Xbox app, Game Pass or game sign-in is broken on a custom build.",
+                    "RUN FIX",
+                    () => ConfirmThen("XBOX & GAMING SERVICES",
+                        "This starts Xbox services and refreshes the Gaming Services package.\n\nContinue?",
+                        _fixes.RepairGamingAsync))
             ]
         });
 
