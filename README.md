@@ -56,6 +56,7 @@ Beyond the tweak pages, the app includes:
 - **Startup Manager** using the native StartupApproved data.
 - **Context Menu** management for shell verbs.
 - **Windows Debloat** with a 37-entry AppX catalog and per-app removal.
+- **Fixes & Repairs** for display refresh, Windows Search, Bluetooth, NVIDIA Control Panel, microphone access, network/Wi-Fi and the page file.
 - **Cleaner** with native cleanup categories and recycle-bin support.
 - **Power Plans** with installed Windows schemes and all 20 legacy ready-made plans.
 - **Backup & Restore** with restore points and registry exports.
