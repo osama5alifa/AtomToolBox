@@ -26,7 +26,8 @@ public sealed class PageFactory(
     IBackupService backup,
     ISettingsStore settings,
     ITweakStateStore state,
-    IAuditService audit)
+    IAuditService audit,
+    ISystemFixService fixes)
 {
     private ShellViewModel? _shell;
 
@@ -39,6 +40,7 @@ public sealed class PageFactory(
         return id switch
         {
             "dashboard" => new DashboardViewModel(probe, toast),
+            "fixes" => new FixesViewModel(fixes, environment, toast),
             "monitor" => new MonitorViewModel(monitor, environment, toast),
             "shortcuts" => new ShortcutsViewModel(shortcutCatalog, environment, toast),
             "windows" or "gaming" or "gpu" or "power" or "network" or "privacy" or "personalize" or "brave"

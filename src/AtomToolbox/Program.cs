@@ -10,6 +10,7 @@ using Atom.Toolbox.Desktop.ViewModels;
 using Atom.Toolbox.Infrastructure.Apps;
 using Atom.Toolbox.Infrastructure.Catalog;
 using Atom.Toolbox.Infrastructure.ContextMenu;
+using Atom.Toolbox.Infrastructure.Fixes;
 using Atom.Toolbox.Infrastructure.Maintenance;
 using Atom.Toolbox.Infrastructure.Power;
 using Atom.Toolbox.Infrastructure.Processes;
@@ -43,6 +44,7 @@ internal sealed class AtomApplication : System.Windows.Application
         var registry = new RegistryStore();
         var processes = ProcessRunner.Shared;
         var serviceHost = new ServiceHost();
+        var systemFixes = new SystemFixService(registry, serviceHost, processes, environment);
 
         var catalog = CatalogResources.Tweaks;
         var settings = new SettingsStore(environment);
@@ -93,7 +95,8 @@ internal sealed class AtomApplication : System.Windows.Application
             backup,
             settings,
             state,
-            audit);
+            audit,
+            systemFixes);
 
         Shell = new ShellViewModel(
             catalog,

@@ -335,7 +335,7 @@ public sealed class ShellViewModel : ObservableObject
         [
             Group("SYSTEM", "DASHBOARD", "BACKGROUND MONITOR", "SHORTCUTS"),
             Group("OPTIMIZATIONS", "WINDOWS", "GAMING", "GPU", "POWER", "NETWORK", "PRIVACY SETTINGS"),
-            Group("TOOLS & UTILITIES", "CONTEXT MENU", "BRAVE DEBLOATER", "WINDOWS DEBLOAT", "CLEANER", "POWER PLANS", "STARTUP MANAGER", "PERSONALIZE"),
+            Group("TOOLS & UTILITIES", "FIXES & REPAIRS", "CONTEXT MENU", "BRAVE DEBLOATER", "WINDOWS DEBLOAT", "CLEANER", "POWER PLANS", "STARTUP MANAGER", "PERSONALIZE"),
             Advanced(),
             Group("MANAGEMENT & SAFETY", "BACKUP & RESTORE", "APP INSTALLER", "INSTALLED APPS", "HISTORY", "SETTINGS")
         ];
@@ -371,6 +371,7 @@ public sealed class ShellViewModel : ObservableObject
         "POWER" => "power",
         "NETWORK" => "network",
         "PRIVACY SETTINGS" => "privacy",
+        "FIXES & REPAIRS" => "fixes",
         "CONTEXT MENU" => "contextmenu",
         "BRAVE DEBLOATER" => "brave",
         "WINDOWS DEBLOAT" => "debloat",
