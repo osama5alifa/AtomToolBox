@@ -65,7 +65,7 @@
             <Border Style="{StaticResource AdminWarning}"
                     Visibility="{Binding ShowAdminWarning, Converter={StaticResource BoolToVis}}">
                 <TextBlock Style="{StaticResource WarningText}"
-                           Text="[!] MANY TWEAKS REQUIRE ADMIN — RUN APP AS ADMINISTRATOR FOR FULL EFFECT" />
+                           Text="[!] MANY ACTIONS REQUIRE ADMIN — RUN APP AS ADMINISTRATOR FOR FULL EFFECT" />
             </Border>
 
             <Border Style="{StaticResource Card}" Margin="0,0,0,12"
