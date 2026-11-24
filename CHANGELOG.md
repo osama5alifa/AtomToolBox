@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.6 — fixes & repairs
+
+- Added a **Fixes & Repairs** page with 18 advanced repair cards.
+- Display refresh reset clears stale monitor configuration and re-applies the current mode.
+- Added Windows Search, Bluetooth, NVIDIA Control Panel, microphone, network/Wi-Fi and page-file repairs.
+- Added Windows Update, DISM/SFC component store, WMI, Microsoft Store, audio, print spooler, shell/icon cache, Windows Security, time sync, device rescan and Xbox/Gaming Services repairs.
+- Search results now rebuild on every keystroke and result clicks navigate correctly.
+- Replaced the NSIS/portable packaging with one standalone C# installer that never uses `%TEMP%`.
+
 ## 0.2.5 — native rewrite
 
 - Complete C#/.NET 8 WPF rewrite of the Electron 0.2.x application.

@@ -30,7 +30,7 @@ public sealed class AppInstallerService(IEnvironmentService environment) : IAppI
 
     static AppInstallerService()
     {
-        Client.DefaultRequestHeaders.UserAgent.ParseAdd("AtomToolBox/0.2.5");
+        Client.DefaultRequestHeaders.UserAgent.ParseAdd("AtomToolBox/0.2.6");
     }
 
     public async Task<OperationResult> InstallAsync(

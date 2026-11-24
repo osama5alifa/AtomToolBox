@@ -1,9 +1,9 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Build, test, publish and package AtomToolBox 0.2.5.
+    Build, test, publish and package AtomToolBox 0.2.6.
 .DESCRIPTION
-    Setup creates an offline, single-file installer (AtomToolbox-Setup-0.2.5.exe) from a
+    Setup creates an offline, single-file installer (AtomToolbox-Setup-0.2.6.exe) from a
     self-contained win-x64 publish. No .NET runtime is required on the target PC.
 #>
 [CmdletBinding()]
@@ -19,7 +19,7 @@ $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $project = Join-Path $root 'src\AtomToolbox\AtomToolbox.csproj'
 $dotnet = 'dotnet'
 $common = @('-p:UseSharedCompilation=false', '-p:RestoreIgnoreFailedSources=true')
-$version = '0.2.5'
+$version = '0.2.6'
 
 function Invoke-DotNet {
     param([Parameter(Mandatory = $true)][string[]]$Arguments)

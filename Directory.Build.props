@@ -5,9 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Deterministic>true</Deterministic>
     <DebugType>embedded</DebugType>
-    <Version>0.2.5</Version>
-    <FileVersion>0.2.5.0</FileVersion>
-    <AssemblyVersion>0.2.5.0</AssemblyVersion>
+    <Version>0.2.6</Version>
+    <FileVersion>0.2.6.0</FileVersion>
+    <AssemblyVersion>0.2.6.0</AssemblyVersion>
     <Company>Project Atom</Company>
     <Product>AtomToolBox</Product>
     <Copyright>Copyright © 2026 Project Atom</Copyright>

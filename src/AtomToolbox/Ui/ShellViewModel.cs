@@ -154,7 +154,7 @@ public sealed class ShellViewModel : ObservableObject
     public bool IsToastVisible { get => _isToastVisible; private set => Set(ref _isToastVisible, value); }
     public bool ShowToastSub => ToastSub.Length > 0;
 
-    public string VersionText => "Atom ToolBox v0.2.5";
+    public string VersionText => "Atom ToolBox v0.2.6";
     public string LogoPath => _settings.Current.Theme == AppTheme.Light
         ? "pack://application:,,,/Assets/Logos/logo-light.png"
         : "pack://application:,,,/Assets/Logos/logo-dark.png";

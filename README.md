@@ -1,6 +1,6 @@
 <h1 align="center">AtomToolBox</h1>
 
-[![Version](https://img.shields.io/badge/version-0.2.5-2f81f7?style=for-the-badge)](../../releases/latest)
+[![Version](https://img.shields.io/badge/version-0.2.6-2f81f7?style=for-the-badge)](../../releases/latest)
 [![Windows](https://img.shields.io/badge/Windows-10%20%7C%2011-0078D6?style=for-the-badge&logo=windows)](https://www.microsoft.com/windows)
 [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet)](https://dotnet.microsoft.com/)
 [![Tweaks](https://img.shields.io/badge/tweaks-234-22C55E?style=for-the-badge)](docs/FEATURE_MATRIX.md)
@@ -70,7 +70,13 @@ contain a hidden catalog of PRO tweaks.
 
 ## Current release
 
-**0.2.5** is the native rewrite release:
+**0.2.6** is the fixes-and-repairs release:
+
+- New **Fixes & Repairs** page with 18 advanced repair cards for display refresh, Search, Bluetooth, NVIDIA, microphone, network/Wi-Fi, page file, Windows Update, component store, WMI, Store, audio, printing, shell, Security, time, devices and Xbox/Gaming Services.
+- Search now rebuilds synchronously and opens the clicked result correctly.
+- The single installer no longer uses a temp folder.
+
+**0.2.5** was the native rewrite release:
 
 - All 234 tweak entries are free.
 - The old 79-entry PRO catalog was removed.

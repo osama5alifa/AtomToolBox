@@ -44,7 +44,7 @@ namespace AtomToolboxSetup
     internal sealed class SetupForm : Form
     {
         private const string AppName = "AtomToolBox";
-        private const string Version = "0.2.5";
+        private const string Version = "0.2.6";
         private const string UninstallKey = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\AtomToolBox";
 
         private readonly bool _uninstall;

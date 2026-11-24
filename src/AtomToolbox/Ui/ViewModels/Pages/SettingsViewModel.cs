@@ -80,8 +80,8 @@ public sealed class SettingsViewModel : PageViewModel
             new SettingsRowViewModel
             {
                 Name = "APP VERSION",
-                Description = "Atom ToolBox v0.2.5",
-                TagText = "0.2.5"
+                Description = "Atom ToolBox v0.2.6",
+                TagText = "0.2.6"
             }
         };
 

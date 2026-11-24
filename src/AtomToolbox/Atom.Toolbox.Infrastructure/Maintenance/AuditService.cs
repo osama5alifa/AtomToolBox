@@ -19,7 +19,7 @@ public sealed class AuditService(
         {
             "ATOM TOOLBOX — REGISTRY AUDIT REPORT",
             $"Generated : {DateTimeOffset.Now:yyyy-MM-dd HH:mm:ss zzz}",
-            $"Version   : 0.2.5",
+            $"Version   : 0.2.6",
             $"Machine   : {Environment.MachineName}",
             $"OS        : {Environment.OSVersion.VersionString}",
             new string('=', 78),
